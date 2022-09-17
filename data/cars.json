@@ -1,0 +1,112 @@
+[
+  {
+    "NumberplateText": "WJ08822",
+    "ManufacturedDate": "2006-05-16T11:14:27.7058815",
+    "ManufacturerId": 41,
+    "Price": {
+      "Value": 37527.0,
+      "Kind": "$"
+    },
+    "CountryId": 97,
+    "Owner": {
+      "FirstName": "Grace",
+      "LastName": "Bower"
+    },
+    "EngineKind": "Gas",
+    "KilometersTravelled": 22208.0,
+    "MassInKilograms": 2496.0,
+    "NumWheels": 2,
+    "NumDoors": 6,
+    "Color": {
+      "HexValue": "0xFFB18439"
+    }
+  },
+  {
+    "NumberplateText": "OS02086",
+    "ManufacturedDate": "2000-12-17T15:08:43.6236184",
+    "ManufacturerId": 36,
+    "Price": {
+      "Value": 76728.0,
+      "Kind": "€"
+    },
+    "CountryId": 162,
+    "Owner": {
+      "FirstName": "John",
+      "LastName": "Miller"
+    },
+    "EngineKind": "Gas",
+    "KilometersTravelled": 47653.0,
+    "MassInKilograms": 2837.0,
+    "NumWheels": 8,
+    "NumDoors": 4,
+    "Color": {
+      "HexValue": "0xFFBC5CBD"
+    }
+  },
+  {
+    "NumberplateText": "MS01036",
+    "ManufacturedDate": "2003-12-01T07:26:00.8550638",
+    "ManufacturerId": 10,
+    "Price": {
+      "Value": 47390.0,
+      "Kind": "$"
+    },
+    "CountryId": 42,
+    "Owner": {
+      "FirstName": "Steve",
+      "LastName": "Martin"
+    },
+    "EngineKind": "Gas",
+    "KilometersTravelled": 81248.0,
+    "MassInKilograms": 2231.0,
+    "NumWheels": 8,
+    "NumDoors": 2,
+    "Color": {
+      "HexValue": "0xFF3155B7"
+    }
+  },
+  {
+    "NumberplateText": "RC06536",
+    "ManufacturedDate": "1980-10-11T05:36:34.7573534",
+    "ManufacturerId": 29,
+    "Price": {
+      "Value": 84219.0,
+      "Kind": "$"
+    },
+    "CountryId": 87,
+    "Owner": {
+      "FirstName": "Maria",
+      "LastName": "Smith"
+    },
+    "EngineKind": "Electric",
+    "KilometersTravelled": 58512.0,
+    "MassInKilograms": 1504.0,
+    "NumWheels": 4,
+    "NumDoors": 4,
+    "Color": {
+      "HexValue": "0xFF371061"
+    }
+  },
+  {
+    "NumberplateText": "ND06836",
+    "ManufacturedDate": "2008-12-23T06:00:44.5340801",
+    "ManufacturerId": 14,
+    "Price": {
+      "Value": 94851.0,
+      "Kind": "€"
+    },
+    "CountryId": 65,
+    "Owner": {
+      "FirstName": "John",
+      "LastName": "Martin"
+    },
+    "EngineKind": "Gas",
+    "KilometersTravelled": 167.0,
+    "MassInKilograms": 2733.0,
+    "NumWheels": 8,
+    "NumDoors": 4,
+    "Color": {
+      "HexValue": "0xFF1B4BCD"
+    }
+  }
+]
