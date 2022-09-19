@@ -7,6 +7,8 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
+namespace CarApp;
+
 public struct PersonNames
 {
     public string FirstName;
@@ -22,16 +24,16 @@ public enum EngineKind
     Count,
 }
 
-public struct RGBColor
+public struct RGBAColor
 {
     public uint HexValue;
 
-    public RGBColor(uint hexValue)
+    public RGBAColor(uint hexValue)
     {
         HexValue = hexValue;
     }
 
-    public RGBColor(int r, int g, int b, int a = 0xFF)
+    public RGBAColor(int r, int g, int b, int a = 0xFF)
     {
         Debug.Assert(r > 0 && r <= 0xFF);
         Debug.Assert(g > 0 && g <= 0xFF);
@@ -97,18 +99,16 @@ public struct Currency
 
 public class CarModel
 {
-    public string NumberplateText;
-    public DateTime ManufacturedDate;
-    public int ManufacturerId;
-    public Currency Price;
-    public int CountryId;
-    public PersonNames? Owner;
-    public EngineKind EngineKind;
-    public float KilometersTravelled;
-    public float MassInKilograms;
-    public int NumWheels;
-    public int NumDoors;
-    public RGBColor Color;
+    public string NumberplateText; // { get; set; }
+    public DateTime ManufacturedDate; // { get; set; }
+    public int ManufacturerId; // { get; set; }
+    public Currency Price; // { get; set; }
+    public int CountryId; // { get; set; }
+    public PersonNames? Owner; // { get; set; }
+    public EngineKind EngineKind; // { get; set; }
+    public float KilometersTravelled; // { get; set; }
+    public int NumWheels; // { get; set; }
+    public RGBAColor Color; // { get; set; }
 
     public bool IsOwned => Owner.HasValue;
 }
@@ -116,6 +116,28 @@ public class CarModel
 public class AssetContext
 {
     public string DataPath { get; set; }
+}
+
+public class CarDependenciesRegistry
+{
+    private const string _ManufacturersFileName = "car_manufacturers.txt";
+    public string[] Manufacturers { get; private set; }
+
+    private const string _CountriesFileName = "countries.txt";
+    public string[] Countries { get; private set; }
+
+    public bool Initialize(AssetContext assets)
+    {
+        Manufacturers = assets.ReadFileStrings(_ManufacturersFileName);
+        if (Manufacturers is null)
+            return false;
+
+        Countries = assets.ReadFileStrings(_CountriesFileName);
+        if (Countries is null)
+            return false;
+
+        return true;
+    }
 }
 
 public static class DataHelper
@@ -197,33 +219,11 @@ public static class NumberHelper
     }
 }
 
-public class CarDependenciesRegistry
-{
-    private const string _ManufacturersFileName = "car_manufacturers.txt";
-    public string[] Manufacturers { get; private set; }
-
-    private const string _CountriesFileName = "countries.txt";
-    public string[] Countries { get; private set; }
-
-    public bool Initialize(AssetContext assets)
-    {
-        Manufacturers = assets.ReadFileStrings(_ManufacturersFileName);
-        if (Manufacturers is null)
-            return false;
-
-        Countries = assets.ReadFileStrings(_CountriesFileName);
-        if (Countries is null)
-            return false;
-
-        return true;
-    }
-}
-
 public class OnlyFieldsResolver : DefaultContractResolver
 {
     public static readonly OnlyFieldsResolver Instance = new OnlyFieldsResolver();
 
-    public OnlyFieldsResolver()
+    private OnlyFieldsResolver()
     {
         this.IgnoreSerializableAttribute = true;
         this.IgnoreSerializableInterface = true;
@@ -248,6 +248,7 @@ public class OnlyFieldsResolver : DefaultContractResolver
 public sealed class HexStringJsonConverter : JsonConverter
 {
     public static readonly HexStringJsonConverter Instance = new HexStringJsonConverter();
+    private HexStringJsonConverter(){}
 
     public override bool CanConvert(Type objectType)
     {
@@ -271,6 +272,7 @@ public sealed class HexStringJsonConverter : JsonConverter
 public sealed class CurrencyKindConverter : JsonConverter
 {
     public static readonly CurrencyKindConverter Instance = new CurrencyKindConverter();
+    private CurrencyKindConverter(){}
 
     public override bool CanConvert(Type objectType)
     {
@@ -324,6 +326,7 @@ public sealed class EnumAsStringsConverter<T> : JsonConverter where T : Enum
         NameToValue = values.ToDictionary(v => Enum.GetName(typeof(T), v));
         ValueToName = NameToValue.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     }
+    private EnumAsStringsConverter(){}
 
     public override bool CanConvert(Type objectType)
     {
@@ -413,22 +416,18 @@ public class Program
                 }
 
                 {
-                    const int min = 500;
-                    const int max = 3000;
-                    car.MassInKilograms = rng.Range(min, max);
-                }
-
-                {
                     var minDate = new DateTime(year: 1980, month: 1, day: 1);
                     var maxDate = new DateTime(year: 2022, month: 9, day: 16);
                     var diff = maxDate.Subtract(minDate);
                     car.ManufacturedDate = minDate.AddTicks(rng.NextInt64() % diff.Ticks);
                 }
 
-                car.NumDoors = rng.Range(1, 4) * 2;
                 car.NumWheels = rng.Range(1, 4) * 2;
-                car.Price.Value = (decimal) rng.Range(1_000, 100_000);
-                car.Price.Kind = (CurrencyKind) (rng.Next() % (int) CurrencyKind.Count);
+                car.Price = new Currency()
+                {
+                    Value = (decimal) rng.Range(1_000, 100_000),
+                    Kind = (CurrencyKind) (rng.Next() % (int) CurrencyKind.Count),
+                };
                 
                 if (rng.NextDouble() > 0.5f)
                 {
@@ -440,7 +439,7 @@ public class Program
                 }
 
                 {
-                    var color = new RGBColor(unchecked((uint) rng.Next()));
+                    var color = new RGBAColor(unchecked((uint) rng.Next()));
                     color.Alpha = 255;
                     car.Color = color;
                 }

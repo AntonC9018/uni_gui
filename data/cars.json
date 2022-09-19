@@ -1,112 +1,93 @@
 [
   {
     "NumberplateText": "WJ08822",
-    "ManufacturedDate": "2006-05-16T11:14:27.7058815",
+    "ManufacturedDate": "1999-01-24T09:17:08.0526178",
     "ManufacturerId": 41,
     "Price": {
-      "Value": 37527.0,
+      "Value": 55797.0,
       "Kind": "$"
     },
     "CountryId": 97,
-    "Owner": {
-      "FirstName": "Grace",
-      "LastName": "Bower"
-    },
+    "Owner": null,
     "EngineKind": "Gas",
     "KilometersTravelled": 22208.0,
-    "MassInKilograms": 2496.0,
-    "NumWheels": 2,
-    "NumDoors": 6,
+    "NumWheels": 8,
     "Color": {
-      "HexValue": "0xFFB18439"
+      "HexValue": "0xFF8F31CA"
     }
   },
   {
-    "NumberplateText": "OS02086",
-    "ManufacturedDate": "2000-12-17T15:08:43.6236184",
-    "ManufacturerId": 36,
+    "NumberplateText": "BG08454",
+    "ManufacturedDate": "1983-09-01T22:50:56.7715055",
+    "ManufacturerId": 7,
     "Price": {
-      "Value": 76728.0,
+      "Value": 22330.0,
       "Kind": "€"
     },
-    "CountryId": 162,
+    "CountryId": 83,
+    "Owner": null,
+    "EngineKind": "Diesel",
+    "KilometersTravelled": 92672.0,
+    "NumWheels": 4,
+    "Color": {
+      "HexValue": "0xFFB6E26A"
+    }
+  },
+  {
+    "NumberplateText": "HI02441",
+    "ManufacturedDate": "1995-07-12T17:24:37.2586263",
+    "ManufacturerId": 30,
+    "Price": {
+      "Value": 82376.0,
+      "Kind": "$"
+    },
+    "CountryId": 7,
     "Owner": {
       "FirstName": "John",
-      "LastName": "Miller"
-    },
-    "EngineKind": "Gas",
-    "KilometersTravelled": 47653.0,
-    "MassInKilograms": 2837.0,
-    "NumWheels": 8,
-    "NumDoors": 4,
-    "Color": {
-      "HexValue": "0xFFBC5CBD"
-    }
-  },
-  {
-    "NumberplateText": "MS01036",
-    "ManufacturedDate": "2003-12-01T07:26:00.8550638",
-    "ManufacturerId": 10,
-    "Price": {
-      "Value": 47390.0,
-      "Kind": "$"
-    },
-    "CountryId": 42,
-    "Owner": {
-      "FirstName": "Steve",
-      "LastName": "Martin"
-    },
-    "EngineKind": "Gas",
-    "KilometersTravelled": 81248.0,
-    "MassInKilograms": 2231.0,
-    "NumWheels": 8,
-    "NumDoors": 2,
-    "Color": {
-      "HexValue": "0xFF3155B7"
-    }
-  },
-  {
-    "NumberplateText": "RC06536",
-    "ManufacturedDate": "1980-10-11T05:36:34.7573534",
-    "ManufacturerId": 29,
-    "Price": {
-      "Value": 84219.0,
-      "Kind": "$"
-    },
-    "CountryId": 87,
-    "Owner": {
-      "FirstName": "Maria",
       "LastName": "Smith"
     },
-    "EngineKind": "Electric",
-    "KilometersTravelled": 58512.0,
-    "MassInKilograms": 1504.0,
-    "NumWheels": 4,
-    "NumDoors": 4,
+    "EngineKind": "Bio",
+    "KilometersTravelled": 83472.0,
+    "NumWheels": 6,
     "Color": {
-      "HexValue": "0xFF371061"
+      "HexValue": "0xFFB3B8AE"
     }
   },
   {
-    "NumberplateText": "ND06836",
-    "ManufacturedDate": "2008-12-23T06:00:44.5340801",
-    "ManufacturerId": 14,
+    "NumberplateText": "TN06772",
+    "ManufacturedDate": "2000-08-07T12:25:13.8081762",
+    "ManufacturerId": 34,
     "Price": {
-      "Value": 94851.0,
+      "Value": 63100.0,
       "Kind": "€"
     },
-    "CountryId": 65,
-    "Owner": {
-      "FirstName": "John",
-      "LastName": "Martin"
-    },
-    "EngineKind": "Gas",
-    "KilometersTravelled": 167.0,
-    "MassInKilograms": 2733.0,
+    "CountryId": 109,
+    "Owner": null,
+    "EngineKind": "Diesel",
+    "KilometersTravelled": 76508.0,
     "NumWheels": 8,
-    "NumDoors": 4,
     "Color": {
-      "HexValue": "0xFF1B4BCD"
+      "HexValue": "0xFF413802"
+    }
+  },
+  {
+    "NumberplateText": "IA05672",
+    "ManufacturedDate": "2010-10-28T15:30:06.8259775",
+    "ManufacturerId": 1,
+    "Price": {
+      "Value": 72981.0,
+      "Kind": "$"
+    },
+    "CountryId": 56,
+    "Owner": {
+      "FirstName": "Maria",
+      "LastName": "Miller"
+    },
+    "EngineKind": "Diesel",
+    "KilometersTravelled": 31238.0,
+    "NumWheels": 4,
+    "Color": {
+      "HexValue": "0xFF04BC88"
     }
   }
 ]
