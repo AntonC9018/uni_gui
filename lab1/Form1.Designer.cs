@@ -1,4 +1,6 @@
-﻿namespace CarApp;
+﻿#if VISUAL_STUDIO_DESIGNER
+
+namespace CarApp;
 
 partial class Form1
 {
@@ -20,10 +22,6 @@ partial class Form1
         base.Dispose(disposing);
     }
 
-    private void InitializeComponent_NoDesigner()
-    {
-    }
-
     #region Windows Form Designer generated code
 
     /// <summary>
@@ -40,3 +38,4 @@ partial class Form1
 
     #endregion
 }
+#endif

@@ -25,13 +25,13 @@ public class Program
 
         var jsonSettings = CarModelUtils.GetSerializerSettings();
         var jsonSerializer = JsonSerializer.Create(jsonSettings);
+        var rng = new Random(80850);
 
         const string carsFileName = "cars.json";
         if (!assets.TryReadJson(carsFileName, jsonSerializer, out List<CarModel> cars))
         {
             const int numCarsToGenerate = 5;
             cars = new List<CarModel>();
-            var rng = new Random(80850);
 
             string[] firstNames = { "Steve", "John", "Maria", "Grace", };
             string[] lastNames = { "Smith", "Miller", "Martin", "Bower", };
