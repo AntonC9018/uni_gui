@@ -1,6 +1,6 @@
-using System.Windows.Forms;
-using System;
 using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 using CarApp.Model;
 
 namespace CarApp;
@@ -18,7 +18,7 @@ public class CarDatabase
     }
 }
 
-public partial class Form1 : Form
+public partial class Form1 : Window
 {
     private CarDatabase _database;
 
@@ -26,40 +26,19 @@ public partial class Form1 : Form
     {
         _database = database;
         InitializeComponent();
+        InitializeComponent2();
     }
     
-    private void InitializeComponent()
+    private void InitializeComponent2()
     {
-        var comboBox = new ComboBox();
-        Controls.Add(comboBox);
+        var container = (Grid) GetVisualChild(0);
 
-        var listBox = new ListBox();
-        Controls.Add(listBox);
+        var text = new TextBlock();
+        text.Text = "Hello world";
+        container.Children.Add(text);
 
         var textBox = new TextBox();
-        Controls.Add(textBox);
-
-        // bind to List<Foo>
-        BindingSource comboBoxBindingSource = new BindingSource();
-        comboBoxBindingSource.DataSource = _database.Cars;
-        // use this binding source in comboBox1
-        // for display use FooName
-        comboBox.DataSource = comboBoxBindingSource;
-        comboBox.DisplayMember = "FooName";
-
-        // bind to comboBox1's SelectedValue
-        // it will point to the Foo selected in combobox
-        BindingSource listBoxBindingSource = new BindingSource();
-        listBoxBindingSource.DataSource = comboBox;
-        listBoxBindingSource.DataMember = "SelectedValue";
-        // use this binding source in listBox1
-        // for display use BarName
-        listBox.DataSource = listBoxBindingSource;
-        listBox.DisplayMember = "BarName";
-
-        // bind to comboBox'1s SelectedValue (reusing listBoxBindingSource)
-        // and set Text to value of BarDesc
-        textBox.DataBindings.Add("Text", listBoxBindingSource, "BarDesc");
+        container.Children.Add(textBox);
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false
