@@ -45,7 +45,10 @@ public class Program
         }
 
         ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
+
+        var db = new CarDatabase(cars, carRegistry);
+        var form = new Form1(db);
+        Application.Run(form);
 
         return 0;
     }

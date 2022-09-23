@@ -4,7 +4,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <DefineConstants Condition=" '$(BuildingInsideVisualStudio)' == 'true' ">VISUAL_STUDIO_DESIGNER</DefineConstants> 
+
+    <!-- Uncomment to enable the designer generated code -->
+    <!-- <DefineConstants>VISUAL_STUDIO_DESIGNER</DefineConstants> -->
   </PropertyGroup>
 
   <ItemGroup>
