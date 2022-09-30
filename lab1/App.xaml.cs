@@ -5,7 +5,6 @@ using System.IO;
 using Newtonsoft.Json;
 using CarApp.Model;
 using CarApp.Assets;
-using CarApp;
 
 namespace CarApp
 {
@@ -16,6 +15,16 @@ namespace CarApp
     {
         private void Main(object sender, StartupEventArgs e)
         {
+            this.DispatcherUnhandledException += (_, e) =>
+            {
+                MessageBox.Show(
+                    "An unhandled exception just occurred: " + e.Exception.Message,
+                    "Exception Sample",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                e.Handled = true;
+            };
+
             var basePath = (e.Args.Length > 1) ? e.Args[1] : Directory.GetCurrentDirectory();
             var dataPath = Path.Join(basePath, "data");
             var assets = DataHelper.CreateAssetContext(dataPath);
