@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
+using System.Windows.Media;
 using CarApp.Model;
 
 namespace CarApp;
@@ -31,14 +34,23 @@ public partial class Form1 : Window
     
     private void InitializeComponent2()
     {
-        var container = this.Root;
+        var container = (Panel) this.Content;
 
         var text = new TextBlock();
         text.Text = "Hello world";
+        text.Foreground = new SolidColorBrush
+        {
+            Color = Color.FromRgb(0xff, 0xff, 0xff),
+        };
         container.Children.Add(text);
 
         var textBox = new TextBox();
         container.Children.Add(textBox);
+
+        container.Background = new SolidColorBrush
+        {
+            Color = Color.FromRgb(0, 0, 0),
+        };
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false
