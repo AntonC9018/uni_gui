@@ -31,7 +31,7 @@ public partial class Form1 : Window
     
     private void InitializeComponent2()
     {
-        var container = (Grid) GetVisualChild(0);
+        var container = this.Root;
 
         var text = new TextBlock();
         text.Text = "Hello world";
