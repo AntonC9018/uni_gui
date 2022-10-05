@@ -26,7 +26,7 @@ public class CarModel
     public bool IsOwned => Owner.HasValue;
 }
 
-public struct PersonNames
+public record struct PersonNames
 {
     public string FirstName;
     public string LastName;
@@ -41,7 +41,7 @@ public enum EngineKind
     Count,
 }
 
-public struct RGBAColor
+public record struct RGBAColor
 {
     public uint HexValue;
 
@@ -108,7 +108,7 @@ public enum CurrencyKind
     Count,
 }
 
-public struct Currency
+public record struct Currency
 {
     public decimal Value;
     public CurrencyKind Kind;
