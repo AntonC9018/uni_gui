@@ -65,7 +65,7 @@ public partial class Form1 : Window
         BindingOperations.SetBinding(textBox, TextBox.TextProperty, binding);
 
         var dispatcherTimer = new DispatcherTimer();
-        dispatcherTimer.Tick += (_, e) =>
+        dispatcherTimer.Tick += (_, _) =>
         {
             carModelBindingSource.NumberplateText += '1';
         };
