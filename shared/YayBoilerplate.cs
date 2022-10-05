@@ -9,18 +9,19 @@ public interface IGet<T> where T : class
 }
 
 // Hurray, I love boilerplate so much (I don't).
-public class CarModelWrapper : System.ComponentModel.INotifyPropertyChanged
+public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged
 {
-    private IGet<CarModel> _getModel;
-    public IGet<CarModel> ModelProvider
+    private CarModel _model;
+    public CarModel Model
     {
+        get => _model;
         set
         {
-            _getModel = value;
+            _model = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
         }
     }
-    public CarModel Model { get => _getModel.Value; }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public string NumberplateText

@@ -2,10 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Threading;
 using CarApp.Model;
 
 namespace CarApp;
 
+public class DirectGet<T> : IGet<T> where T : class
+{
+    public T Value { get; }
+    public DirectGet(T value) { Value = value; }
+}
 
 public class CarDatabase
 {
@@ -42,6 +49,28 @@ public partial class Form1 : Window
         textBox.Text = "Some default text";
         Grid.SetColumn(textBox, 1);
         container.Children.Add(textBox);
+
+        var carModel = new CarModel();
+        var carModelBindingSource = new CarModelBindingSource();
+        carModelBindingSource.Model = carModel;
+
+        carModelBindingSource.NumberplateText = "Hello";
+
+        var binding = new Binding();
+        binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+        binding.Mode = BindingMode.TwoWay;
+        binding.Path = new PropertyPath(nameof(carModelBindingSource.NumberplateText));
+        binding.Source = carModelBindingSource;
+        // binding.Converter
+        BindingOperations.SetBinding(textBox, TextBox.TextProperty, binding);
+
+        var dispatcherTimer = new DispatcherTimer();
+        dispatcherTimer.Tick += (_, e) =>
+        {
+            carModelBindingSource.NumberplateText += '1';
+        };
+        dispatcherTimer.Interval = TimeSpan.FromMilliseconds(1000);
+        dispatcherTimer.Start();
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false
