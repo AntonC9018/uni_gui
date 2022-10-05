@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -14,11 +15,11 @@ public interface IGet<T> where T : class
 // Hurray, I love boilerplate so much (I don't).
 public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo
 {
-    private AbstractValidator<CarModel> _validator;
+    private AbstractValidator<CarModelBindingSource> _validator;
     private CarModel _model;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public CarModelBindingSource(AbstractValidator<CarModel> validator)
+    public CarModelBindingSource(AbstractValidator<CarModelBindingSource> validator)
     {
         _validator = validator;
     }
@@ -33,6 +34,12 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
         }
     }
 
+    private void OnPropertyChanged(string propertyName)
+    {
+        _cachedValidationResult = null;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     public string NumberplateText
     {
         get => Model.NumberplateText; 
@@ -41,7 +48,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (NumberplateText != value)
             {
                 Model.NumberplateText = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NumberplateText"));
+                OnPropertyChanged("NumberplateText");
             }
         }
     }
@@ -53,7 +60,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (ManufacturedDate != value)
             {
                 Model.ManufacturedDate = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ManufacturedDate"));
+                OnPropertyChanged("ManufacturedDate");
             }
         }
     }
@@ -65,7 +72,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (ManufacturerId != value)
             {
                 Model.ManufacturerId = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ManufacturerId"));
+                OnPropertyChanged("ManufacturerId");
             }
         }
     }
@@ -77,7 +84,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Price != value)
             {
                 Model.Price = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Price"));
+                OnPropertyChanged("Price");
             }
         }
     }
@@ -91,7 +98,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
                 var p = Model.Price;
                 p.Value = value;
                 Model.Price = p;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Price_Value"));
+                OnPropertyChanged("Price_Value");
             }
         }
     }
@@ -105,7 +112,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
                 var p = Model.Price;
                 p.Kind = value;
                 Model.Price = p;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Price_Kind"));
+                OnPropertyChanged("Price_Kind");
             }
         }
     }
@@ -117,7 +124,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (CountryId != value)
             {
                 Model.CountryId = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CountryId"));
+                OnPropertyChanged("CountryId");
             }
         }
     }
@@ -129,7 +136,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Owner != value)
             {
                 Model.Owner = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Owner"));
+                OnPropertyChanged("Owner");
             }
         }
     }
@@ -143,7 +150,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
                 var p = Model.Owner.Value;
                 p.FirstName = value;
                 Model.Owner = p;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Owner_FirstName"));
+                OnPropertyChanged("Owner_FirstName");
             }
         }
     }
@@ -157,7 +164,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
                 var p = Model.Owner.Value;
                 p.LastName = value;
                 Model.Owner = p;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Owner_LastName"));
+                OnPropertyChanged("Owner_LastName");
             }
         }
     }
@@ -169,7 +176,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (EngineKind != value)
             {
                 Model.EngineKind = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EngineKind"));
+                OnPropertyChanged("EngineKind");
             }
         }
     }
@@ -181,7 +188,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (KilometersTravelled != value)
             {
                 Model.KilometersTravelled = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("KilometersTravelled"));
+                OnPropertyChanged("KilometersTravelled");
             }
         }
     }
@@ -193,7 +200,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (NumWheels != value)
             {
                 Model.NumWheels = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NumWheels"));
+                OnPropertyChanged("NumWheels");
             }
         }
     }
@@ -205,7 +212,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Color != value)
             {
                 Model.Color = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color"));
+                OnPropertyChanged("Color");
             }
         }
     }
@@ -218,7 +225,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Color.Red != value)
             {
                 Model.Color.Red = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color_Red"));
+                OnPropertyChanged("Color_Red");
             }
         }
     }
@@ -231,7 +238,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Color.Green != value)
             {
                 Model.Color.Green = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color_Green"));
+                OnPropertyChanged("Color_Green");
             }
         }
     }
@@ -244,7 +251,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Color.Blue != value)
             {
                 Model.Color.Blue = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color_Blue"));
+                OnPropertyChanged("Color_Blue");
             }
         }
     }
@@ -257,21 +264,39 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             if (Color.Alpha != value)
             {
                 Model.Color.Alpha = value; 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color_Alpha"));
+                OnPropertyChanged("Color_Alpha");
             }
         }
     }
 
-    string IDataErrorInfo.Error => null;
-    string IDataErrorInfo.this[string columnName]
+    private ValidationResult _cachedValidationResult;
+    private ValidationResult ValidationResult => _cachedValidationResult ?? _validator.Validate(this);
+
+    string IDataErrorInfo.Error
     {
         get
         {
+            var r = ValidationResult;
+            if (r.Errors.Count == 0)
+                return null;
+            var errors = string.Join(Environment.NewLine, r.Errors.Select(x => x.ErrorMessage));
+            return errors;
+        }
+    }
+    public string this[string columnName]
+    {
+        get
+        {
+            var firstOrDefault = ValidationResult.Errors.FirstOrDefault(p => p.PropertyName == columnName);
+            return firstOrDefault?.ErrorMessage;
         }
     }
 }
 
-public class CarValidator : AbstractValidator<CarModel>
+
+// Might want to pass this thing an interface with all of the properties instead.
+// But then the CarModel would also have to implement those... It sucks either way...
+public class CarValidator : AbstractValidator<CarModelBindingSource>
 {
     private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
 
@@ -279,9 +304,9 @@ public class CarValidator : AbstractValidator<CarModel>
     {
         RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Length);
         RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Length);
-        RuleFor(x => x.Color.Alpha).Equal(255);
+        RuleFor(x => x.Color_Alpha).Equal((byte) 0xff);
         RuleFor(x => x.KilometersTravelled).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Price.Value).GreaterThan(0);
+        RuleFor(x => x.Price_Value).GreaterThan(0);
         RuleFor(x => x.ManufacturedDate)
             .GreaterThan(new DateTime(year: 1886, month: 1, day: 29))
             .LessThanOrEqualTo(_ => DateTime.Now);
