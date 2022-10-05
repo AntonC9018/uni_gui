@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using CarApp.Model;
 
 namespace CarApp;
@@ -32,25 +32,16 @@ public partial class Form1 : Window
     
     private void InitializeComponent2()
     {
-        var container = this.Root;
+        var container = (Panel) this.Content;
 
-        var label = new Label();
-        label.Content = "Label";
-        Grid.SetColumn(label, 0);
-        container.Children.Add(label);
+        var text = new TextBlock();
+        text.Text = "Hello world";
+        container.Children.Add(text);
 
         var textBox = new TextBox();
         textBox.Text = "Some default text";
         Grid.SetColumn(textBox, 1);
         container.Children.Add(textBox);
-
-        var carTest = new CarModel();
-        var stringBinding = new Binding("NumberplateText");
-        stringBinding.Mode = BindingMode.TwoWay;
-        stringBinding.Source = carTest;
-        // stringBinding.Converter = new{};
-        // stringBinding.ValidationRules = 
-        BindingOperations.SetBinding(textBox, TextBox.TextProperty, stringBinding);
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false
