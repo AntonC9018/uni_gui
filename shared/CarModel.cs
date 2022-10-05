@@ -114,69 +114,6 @@ public record struct Currency
     public CurrencyKind Kind;
 }
 
-public static class CarModelValidation
-{
-    public static bool IsNumberplateTextValid(string numberplateText)
-    {
-        return true;
-    }
-
-    public static bool IsManufacturedDateValid(DateTime manufacturedDate, DateTime todaysDate)
-    {
-        return manufacturedDate.CompareTo(new DateTime(year: 1886, month: 1, day: 29)) > 0
-            && manufacturedDate.CompareTo(todaysDate) <= 0;
-    }
-
-    public static bool IsManufacturerIdValid(int manufacturerId, int manufacturerIdCount)
-    {
-        return manufacturerId >= 0 && manufacturerId < manufacturerIdCount;
-    }
-    
-    public static bool IsPriceValid(Currency price)
-    {
-        return price.Value >= 0;
-    }
-
-    public static bool IsCountryIdValid(int countryId, int countryIdCount)
-    {
-        return countryId >= 0 && countryId < countryIdCount;
-    }
-
-    private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
-    public static bool IsOwnerValid(PersonNames? owner)
-    {
-        if (!owner.HasValue)
-            return false;
-
-        var names = owner.Value;
-        if (names.FirstName is null || names.LastName is null)
-            return false;
-        if (!_NameRegex.IsMatch(names.FirstName) || !_NameRegex.IsMatch(names.LastName))
-            return false;
-        return true;
-    }
-
-    public static bool IsEngineKindValid(EngineKind engineKind)
-    {
-        return true;
-    }
-
-    public static bool IsKilometersTravelledValid(float kilometersTravelled)
-    {
-        return float.IsNormal(kilometersTravelled) && kilometersTravelled >= 0;
-    }
-
-    public static bool IsNumWheelsValid(int numWheels)
-    {
-        return numWheels > 0;
-    }
-
-    public static bool IsColorValid(RGBAColor color)
-    {
-        return color.Alpha == 1;
-    }
-}
-
 
 public class OnlyFieldsResolver : DefaultContractResolver
 {

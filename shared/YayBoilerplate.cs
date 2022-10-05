@@ -1,5 +1,8 @@
 using System;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace CarApp.Model;
 
@@ -9,9 +12,17 @@ public interface IGet<T> where T : class
 }
 
 // Hurray, I love boilerplate so much (I don't).
-public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged
+public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo
 {
+    private AbstractValidator<CarModel> _validator;
     private CarModel _model;
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public CarModelBindingSource(AbstractValidator<CarModel> validator)
+    {
+        _validator = validator;
+    }
+    
     public CarModel Model
     {
         get => _model;
@@ -21,8 +32,6 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
         }
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     public string NumberplateText
     {
@@ -252,4 +261,53 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             }
         }
     }
+
+    string IDataErrorInfo.Error => null;
+    string IDataErrorInfo.this[string columnName]
+    {
+        get
+        {
+        }
+    }
 }
+
+public class CarValidator : AbstractValidator<CarModel>
+{
+    private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
+
+    public CarValidator(CarDependenciesRegistry registry)
+    {
+        RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Length);
+        RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Length);
+        RuleFor(x => x.Color.Alpha).Equal(255);
+        RuleFor(x => x.KilometersTravelled).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Price.Value).GreaterThan(0);
+        RuleFor(x => x.ManufacturedDate)
+            .GreaterThan(new DateTime(year: 1886, month: 1, day: 29))
+            .LessThanOrEqualTo(_ => DateTime.Now);
+        RuleFor(x => x.NumWheels).GreaterThan(0);
+        RuleFor(x => x.Owner).Must((model, x, context) =>
+        {
+            if (!x.HasValue)
+                return true;
+
+            var names = x.Value;
+
+            bool result = true;
+            const string commonString = " does not match regex, must start with a capital letter.";
+            if (!_NameRegex.IsMatch(names.FirstName))
+            {
+                context.AddFailure("The first name " + commonString);
+                result = false;
+            }
+            if (!_NameRegex.IsMatch(names.LastName))
+            {
+                context.AddFailure("The last name " + commonString);
+                result = false;
+            }
+            return result;
+        });
+    }
+}
+
+

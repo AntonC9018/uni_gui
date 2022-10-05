@@ -51,7 +51,8 @@ public partial class Form1 : Window
         container.Children.Add(textBox);
 
         var carModel = new CarModel();
-        var carModelBindingSource = new CarModelBindingSource();
+        var validator = new CarValidator(_database.Registry);
+        var carModelBindingSource = new CarModelBindingSource(validator);
         carModelBindingSource.Model = carModel;
 
         carModelBindingSource.NumberplateText = "Hello";
