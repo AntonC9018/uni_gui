@@ -270,12 +270,13 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     }
 
     private ValidationResult _cachedValidationResult;
-    private ValidationResult ValidationResult => _cachedValidationResult ?? _validator.Validate(this);
+    private ValidationResult ValidationResult => _cachedValidationResult ??= _validator.Validate(this);
 
     string IDataErrorInfo.Error
     {
         get
         {
+            Console.WriteLine("Getting all errors");
             var r = ValidationResult;
             if (r.Errors.Count == 0)
                 return null;
@@ -287,7 +288,9 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     {
         get
         {
+            Console.WriteLine("Getting errors for " + columnName);
             var firstOrDefault = ValidationResult.Errors.FirstOrDefault(p => p.PropertyName == columnName);
+            Console.WriteLine(firstOrDefault);
             return firstOrDefault?.ErrorMessage;
         }
     }
@@ -320,16 +323,22 @@ public class CarValidator : AbstractValidator<CarModelBindingSource>
 
             bool result = true;
             const string commonString = " does not match regex, must start with a capital letter.";
-            if (!_NameRegex.IsMatch(names.FirstName))
+
+            void Validate(string prop, string propNormalCasing, string value)
             {
-                context.AddFailure("The first name " + commonString);
-                result = false;
+                if (value is null)
+                {
+                    context.AddFailure(prop, "No " + propNormalCasing + ".");
+                    result = false;
+                }
+                else if (!_NameRegex.IsMatch(value))
+                {
+                    context.AddFailure(prop, "The " + propNormalCasing + commonString);
+                    result = false;
+                }
             }
-            if (!_NameRegex.IsMatch(names.LastName))
-            {
-                context.AddFailure("The last name " + commonString);
-                result = false;
-            }
+            Validate("Owner_FirstName", "first name", names.FirstName);
+            Validate("Owner_LastName", "last name", names.LastName);
             return result;
         });
     }

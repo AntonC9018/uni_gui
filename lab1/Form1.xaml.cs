@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -43,12 +44,25 @@ public partial class Form1 : Window
 
         var text = new TextBlock();
         text.Text = "Hello world";
+        Grid.SetColumn(text, 0);
         container.Children.Add(text);
 
-        var textBox = new TextBox();
-        textBox.Text = "Some default text";
-        Grid.SetColumn(textBox, 1);
-        container.Children.Add(textBox);
+        var validationTemplate = (ControlTemplate) this.Resources["validationErrorTemplate"];
+        Debug.Assert(validationTemplate is not null);
+
+        var numberplateTextBox = new TextBox();
+        numberplateTextBox.Text = "Some default text";
+        Grid.SetColumn(numberplateTextBox, 1);
+        Grid.SetRow(numberplateTextBox, 0);
+        container.Children.Add(numberplateTextBox);
+        Validation.SetErrorTemplate(numberplateTextBox, validationTemplate);
+
+        var firstNameTextBox = new TextBox();
+        firstNameTextBox.Text = "Some default text";
+        Grid.SetColumn(firstNameTextBox, 1);
+        Grid.SetRow(firstNameTextBox, 1);
+        container.Children.Add(firstNameTextBox);
+        Validation.SetErrorTemplate(firstNameTextBox, validationTemplate);
 
         var carModel = new CarModel();
         var validator = new CarValidator(_database.Registry);
@@ -56,19 +70,31 @@ public partial class Form1 : Window
         carModelBindingSource.Model = carModel;
 
         carModelBindingSource.NumberplateText = "Hello";
+        carModelBindingSource.Owner = new PersonNames();
 
-        var binding = new Binding();
-        binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-        binding.Mode = BindingMode.TwoWay;
-        binding.Path = new PropertyPath(nameof(carModelBindingSource.NumberplateText));
-        binding.Source = carModelBindingSource;
-        // binding.Converter
-        BindingOperations.SetBinding(textBox, TextBox.TextProperty, binding);
+        Binding CreateBinding(string propPath)
+        {
+            var binding = new Binding(propPath);
+            binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            binding.Mode = BindingMode.TwoWay;
+            binding.Source = carModelBindingSource;
+            binding.ValidatesOnDataErrors = true;
+            return binding;
+        }
+        {
+            var binding = CreateBinding(nameof(carModelBindingSource.NumberplateText));
+            BindingOperations.SetBinding(numberplateTextBox, TextBox.TextProperty, binding);
+        }
+        {
+            var binding = CreateBinding(nameof(carModelBindingSource.Owner_FirstName));
+            BindingOperations.SetBinding(firstNameTextBox, TextBox.TextProperty, binding);
+        }
 
         var dispatcherTimer = new DispatcherTimer();
         dispatcherTimer.Tick += (_, _) =>
         {
-            carModelBindingSource.NumberplateText += '1';
+            var t = this;
+            // carModelBindingSource.NumberplateText = numberplateTextBox.Name + firstNameTextBox.Name;
         };
         dispatcherTimer.Interval = TimeSpan.FromMilliseconds(1000);
         dispatcherTimer.Start();
