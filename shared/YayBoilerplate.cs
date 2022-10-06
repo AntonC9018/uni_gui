@@ -276,7 +276,6 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     {
         get
         {
-            Console.WriteLine("Getting all errors");
             var r = ValidationResult;
             if (r.Errors.Count == 0)
                 return null;
@@ -288,10 +287,8 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     {
         get
         {
-            Console.WriteLine("Getting errors for " + columnName);
-            var firstOrDefault = ValidationResult.Errors.FirstOrDefault(p => p.PropertyName == columnName);
-            Console.WriteLine(firstOrDefault);
-            return firstOrDefault?.ErrorMessage;
+            var errors = ValidationResult.Errors.Where(p => p.PropertyName == columnName);
+            return string.Join(Environment.NewLine, errors);
         }
     }
 }

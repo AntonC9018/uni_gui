@@ -47,7 +47,7 @@ public partial class Form1 : Window
         Grid.SetColumn(text, 0);
         container.Children.Add(text);
 
-        var validationTemplate = (ControlTemplate) this.Resources["validationErrorTemplate"];
+        var validationTemplate = (ControlTemplate) this.Resources["validationTemplate"];
         Debug.Assert(validationTemplate is not null);
 
         var numberplateTextBox = new TextBox();

@@ -6,26 +6,21 @@
         xmlns:local="clr-namespace:CarApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
     <Window.Resources>
-        <ControlTemplate x:Key="validationErrorTemplate">
-            <StackPanel Orientation="Horizontal">
-                <AdornedElementPlaceholder />
-                <TextBlock Text="{Binding [0].ErrorContent}" Margin="10" Foreground="Red">
-                    <!-- <TextBlock.Text>
-                        <Binding Path="[0].ErrorContent" />
-                    </TextBlock.Text> -->
-                </TextBlock>
-                <TextBlock Text="Error"/>
+        <ControlTemplate x:Key="validationTemplate">
+            <StackPanel ToolTip="{Binding [0].ErrorContent}">
+                <Border BorderBrush="Red" BorderThickness="1">
+                    <AdornedElementPlaceholder Name="MyAdorner" />
+                </Border>
             </StackPanel>
-            <!-- <Border BorderBrush="Red" Name="TheBorder" BorderThickness="2">
-                <ContentPresenter/>
-            </Border>       -->
         </ControlTemplate>
     </Window.Resources>
+
     <Grid Name="Root">
         <Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="200" />
+			<ColumnDefinition Width="200" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
