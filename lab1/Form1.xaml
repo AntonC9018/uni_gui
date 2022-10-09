@@ -36,11 +36,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-        
+
         <Grid.Resources>
+            <local:MyDataTemplateSelector x:Key="myDataTemplateSelector"/>
+
             <DataTemplate x:Key="datePicker">
-                <DatePicker SelectedDate="{Binding RelativeSource={RelativeSource TemplatedParent},
-                        Path=(local:TemplateBinding.Property)}"/>
+                <StackPanel>
+                    <DatePicker SelectedDate="{Binding Path=ManufacturedDate}"/>
+                </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="colorPicker">
                 <xctk:ColorPicker SelectedColor="{Binding}"/>
@@ -50,13 +53,21 @@
             <DataTemplate x:Key="dbPicker">
             </DataTemplate>
         </Grid.Resources>
+        
+        <DatePicker
+            Grid.Row="0"
+            Grid.Column="1"
+            SelectedDate="{Binding [0].ManufacturedDate}"/>
 
-        <DataGrid Name="CarDataGrid" Grid.Row="0" Grid.Column="0" AutoGenerateColumns="false">
+        <DataGrid Name="CarDataGrid"
+                  Grid.Row="0" Grid.Column="0"
+                  AutoGenerateColumns="false"
+                  ItemTemplateSelector="{StaticResource myDataTemplateSelector}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Header="ManufacturedOn"
-                    CellTemplate="{StaticResource datePicker}"
-                    local:TemplateBinding.Property="ManufacturedDate" />
+                    local:Properties.TemplateBinding="ManufacturedDate"
+                    local:Properties.TemplateName="datePicker" />
             </DataGrid.Columns>
         </DataGrid>
         <!-- <Label Content="Color" />

@@ -41,19 +41,20 @@ public class GenericProperty<TTarget, TProperty, TSelf> where TTarget : Dependen
     }
 }
 
-public static class TemplateBinding
+public static partial class Properties
 {
-    public static readonly DependencyProperty Property = DependencyProperty.RegisterAttached(
-        typeof(TemplateBinding).Name, ownerType: typeof(DataGridColumn), propertyType: typeof(string));
+    private static readonly DependencyProperty _TemplateBinding = DependencyProperty.RegisterAttached(
+        nameof(TemplateBinding), ownerType: typeof(DataGridColumn), propertyType: typeof(string));
+    public static DependencyProperty TemplateBinding => _TemplateBinding;
 
-    public static string Get(DataGridColumn target)
+    public static string GetTemplateBinding(DataGridColumn target)
     {
-        return (string) target.GetValue(Property);
+        return (string) target.GetValue(TemplateBinding);
     }
 
-    public static void Set(DataGridColumn target, string value)
+    public static void SetTemplateBinding(DataGridColumn target, string value)
     {
-        target.SetValue(Property, value);
+        target.SetValue(TemplateBinding, value);
     }
 }
 
@@ -63,7 +64,7 @@ public partial class Form1 : Window
 
     public Form1(CarDatabase database)
     {
-        _ = TemplateBinding.Property;
+        _ = Properties.TemplateBinding;
         _database = database;
         InitializeComponent();
         // InitializeComponent2();
