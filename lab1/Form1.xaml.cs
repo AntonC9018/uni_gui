@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,18 +9,11 @@ using CarApp.Model;
 
 namespace CarApp;
 
-public class DirectGet<T> : IGet<T> where T : class
-{
-    public T Value { get; }
-    public DirectGet(T value) { Value = value; }
-}
-
 public class CarDatabase
 {
     public readonly ObservableCollection<CarModel> Cars;
     public readonly CarDependenciesRegistry Registry;
-    public readonly ObservableCollection<CarModelBindingSource> CarBindings;
-    private readonly CarValidator _validator;
+    public readonly ObservableViewModelCollection<CarViewModel, CarModel> CarBindings;
 
     public CarDatabase(ObservableCollection<CarModel> cars, CarDependenciesRegistry registry)
     {
@@ -31,83 +21,40 @@ public class CarDatabase
         Registry = registry;
 
         var validator = new CarValidator(registry);
-        _validator = validator;
-        CarBindings = new(cars.Select(c => new CarModelBindingSource(validator, c)));
-
-        Cars.CollectionChanged += (sender, e) =>
-        {
-            Debug.Assert(sender is not null);
-            var collection = (ObservableCollection<CarModel>) sender;
-
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                {
-                    CarBindings.Add(new CarModelBindingSource(_validator, collection[^1]));
-                    break;
-                }
-                case NotifyCollectionChangedAction.Move:
-                {
-                    CarBindings.Move(e.OldStartingIndex, e.NewStartingIndex);
-                    break;
-                }
-                // case NotifyCollectionChangedAction.Replace:
-                // {
-                //     Debug.Fail("Not supported");
-                //     break;
-                // }
-                // case NotifyCollectionChangedAction.Reset:
-                // {
-                //     Debug.Fail("Not supported");
-                //     break;
-                // }
-                case NotifyCollectionChangedAction.Remove:
-                {
-                    CarBindings.RemoveAt(e.OldStartingIndex);
-                    break;
-                }
-                default:
-                {
-                    Debug.Fail("Unsupported case " + e.Action);
-                    break;
-                }
-            }
-        };
-
-        CarBindings.CollectionChanged += (sender, e) =>
-        {
-            Debug.Assert(sender is not null);
-            var collection = (ObservableCollection<CarModelBindingSource>) sender;
-
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                {
-                    // Should have been added manually at this point.
-                    break;
-                }
-                case NotifyCollectionChangedAction.Move:
-                {
-                    Cars.Move(e.OldStartingIndex, e.NewStartingIndex);
-                    break;
-                }
-                case NotifyCollectionChangedAction.Remove:
-                {
-                    Cars.RemoveAt(e.OldStartingIndex);
-                    break;
-                }
-                default:
-                {
-                    Debug.Fail("Unsupported case " + e.Action);
-                    break;
-                }
-            }
-        };
+        CarBindings = new(cars, c => new CarViewModel(validator, c));
     }
 }
 
-public static class PropertyChangedEventHandlerExtensions
+public class GenericProperty<TTarget, TProperty, TSelf> where TTarget : DependencyObject
 {
+    public static readonly DependencyProperty Property = DependencyProperty.RegisterAttached(
+        typeof(TSelf).Name, ownerType: typeof(TTarget), propertyType: typeof(TProperty));
+
+    public static TProperty Get(TTarget target)
+    {
+        return (TProperty) target.GetValue(Property);
+    }
+
+    public static void Set(TTarget target, TProperty value)
+    {
+        target.SetValue(Property, value);
+    }
+}
+
+public static class TemplateBinding
+{
+    public static readonly DependencyProperty Property = DependencyProperty.RegisterAttached(
+        typeof(TemplateBinding).Name, ownerType: typeof(DataGridColumn), propertyType: typeof(string));
+
+    public static string Get(DataGridColumn target)
+    {
+        return (string) target.GetValue(Property);
+    }
+
+    public static void Set(DataGridColumn target, string value)
+    {
+        target.SetValue(Property, value);
+    }
 }
 
 public partial class Form1 : Window
@@ -116,9 +63,12 @@ public partial class Form1 : Window
 
     public Form1(CarDatabase database)
     {
+        _ = TemplateBinding.Property;
         _database = database;
         InitializeComponent();
         // InitializeComponent2();
+
+        CarDataGrid.ItemsSource = database.CarBindings;
     }
     
     private void InitializeComponent2()
@@ -149,7 +99,7 @@ public partial class Form1 : Window
 
         var carModel = new CarModel();
         var validator = new CarValidator(_database.Registry);
-        var carModelBindingSource = new CarModelBindingSource(validator);
+        var carModelBindingSource = new CarViewModel(validator);
         carModelBindingSource.Model = carModel;
 
         carModelBindingSource.NumberplateText = "Hello";

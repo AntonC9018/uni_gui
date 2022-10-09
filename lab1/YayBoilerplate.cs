@@ -13,18 +13,18 @@ public interface IGet<T> where T : class
 }
 
 // Hurray, I love boilerplate so much (I don't).
-public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo, ICarModel
+public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
     private AbstractValidator<ICarModel> _validator;
     private CarModel _model;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public CarModelBindingSource(AbstractValidator<ICarModel> validator)
+    public CarViewModel(AbstractValidator<ICarModel> validator)
     {
         _validator = validator;
     }
 
-    public CarModelBindingSource(AbstractValidator<ICarModel> validator, CarModel model)
+    public CarViewModel(AbstractValidator<ICarModel> validator, CarModel model)
     {
         _validator = validator;
         _model = model;
