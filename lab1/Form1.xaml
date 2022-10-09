@@ -42,7 +42,11 @@
 
             <DataTemplate x:Key="datePicker">
                 <StackPanel>
-                    <DatePicker SelectedDate="{Binding Path=ManufacturedDate}"/>
+                    <!-- Try it with a concrete binding path, to see if it works at all -->
+                    <DatePicker SelectedDate="{Binding Path=[0].ManufacturedDate}"/>
+
+                    <!-- This one should work tho in theory -->
+                    <!-- <DatePicker SelectedDate="{Binding Path=(local:Properties.TemplateName)}"/> -->
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="colorPicker">
