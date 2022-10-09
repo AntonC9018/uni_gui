@@ -1,0 +1,76 @@
+using System;
+using System.Text.RegularExpressions;
+using FluentValidation;
+
+namespace CarApp.Model;
+
+public interface ICarModel
+{
+    CarModel Model { get; set; }
+    string NumberplateText { get; set; }
+    DateTime ManufacturedDate { get; set; }
+    int ManufacturerId { get; set; }
+    Currency Price { get; set; }
+    decimal Price_Value { get; set; }
+    CurrencyKind Price_Kind { get; set; }
+    int CountryId { get; set; }
+    bool HasOwner { get; set; }
+    PersonNames Owner { get; set; }
+    string Owner_FirstName { get; set; }
+    string Owner_LastName { get; set; }
+    EngineKind EngineKind { get; set; }
+    float KilometersTravelled { get; set; }
+    int NumWheels { get; set; }
+    RGBAColor Color { get; set; }
+    byte Color_Red { get; set; }
+    byte Color_Green { get; set; }
+    byte Color_Blue { get; set; }
+    byte Color_Alpha { get; set; }
+}
+
+// Might want to pass this thing an interface with all of the properties instead.
+// But then the CarModel would also have to implement those... It sucks either way...
+public class CarValidator : AbstractValidator<ICarModel>
+{
+    private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
+
+    public CarValidator(CarDependenciesRegistry registry)
+    {
+        RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Length);
+        RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Length);
+        RuleFor(x => x.Color_Alpha).Equal((byte) 0xff);
+        RuleFor(x => x.KilometersTravelled).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Price_Value).GreaterThan(0);
+        RuleFor(x => x.ManufacturedDate)
+            .GreaterThan(new DateTime(year: 1886, month: 1, day: 29))
+            .LessThanOrEqualTo(_ => DateTime.Now);
+        RuleFor(x => x.NumWheels).GreaterThan(0);
+        RuleFor(x => x.Owner).Must((model, x, context) =>
+        {
+            if (!model.HasOwner)
+                return true;
+
+            bool result = true;
+            const string commonString = " does not match regex, must start with a capital letter.";
+
+            void Validate(string prop, string propNormalCasing, string value)
+            {
+                if (value is null)
+                {
+                    context.AddFailure(prop, "No " + propNormalCasing + ".");
+                    result = false;
+                }
+                else if (!_NameRegex.IsMatch(value))
+                {
+                    context.AddFailure(prop, "The " + propNormalCasing + commonString);
+                    result = false;
+                }
+            }
+            Validate(nameof(ICarModel.Owner_FirstName), "first name", x.FirstName);
+            Validate(nameof(ICarModel.Owner_LastName), "last name", x.LastName);
+            return result;
+        });
+    }
+}
+
+

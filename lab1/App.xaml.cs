@@ -56,7 +56,7 @@ namespace CarApp
                 assets.WriteJson(carsFileName, jsonSerializer, cars);
             }
 
-            var db = new CarDatabase(cars, carRegistry);
+            var db = new CarDatabase(new(cars), carRegistry);
             var form = new Form1(db);
             form.Show();
         }

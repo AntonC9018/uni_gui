@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
-using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
 
@@ -13,17 +13,23 @@ public interface IGet<T> where T : class
 }
 
 // Hurray, I love boilerplate so much (I don't).
-public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo
+public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
-    private AbstractValidator<CarModelBindingSource> _validator;
+    private AbstractValidator<ICarModel> _validator;
     private CarModel _model;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public CarModelBindingSource(AbstractValidator<CarModelBindingSource> validator)
+    public CarModelBindingSource(AbstractValidator<ICarModel> validator)
     {
         _validator = validator;
     }
-    
+
+    public CarModelBindingSource(AbstractValidator<ICarModel> validator, CarModel model)
+    {
+        _validator = validator;
+        _model = model;
+    }
+
     public CarModel Model
     {
         get => _model;
@@ -42,55 +48,55 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
 
     public string NumberplateText
     {
-        get => Model.NumberplateText; 
+        get => Model.NumberplateText;
         set
         {
             if (NumberplateText != value)
             {
-                Model.NumberplateText = value; 
+                Model.NumberplateText = value;
                 OnPropertyChanged("NumberplateText");
             }
         }
     }
     public DateTime ManufacturedDate
     {
-        get => Model.ManufacturedDate; 
+        get => Model.ManufacturedDate;
         set
         {
             if (ManufacturedDate != value)
             {
-                Model.ManufacturedDate = value; 
+                Model.ManufacturedDate = value;
                 OnPropertyChanged("ManufacturedDate");
             }
         }
     }
     public int ManufacturerId
     {
-        get => Model.ManufacturerId; 
+        get => Model.ManufacturerId;
         set
         {
             if (ManufacturerId != value)
             {
-                Model.ManufacturerId = value; 
+                Model.ManufacturerId = value;
                 OnPropertyChanged("ManufacturerId");
             }
         }
     }
     public Currency Price
     {
-        get => Model.Price; 
+        get => Model.Price;
         set
         {
             if (Price != value)
             {
-                Model.Price = value; 
+                Model.Price = value;
                 OnPropertyChanged("Price");
             }
         }
     }
     public decimal Price_Value
     {
-        get => Model.Price.Value; 
+        get => Model.Price.Value;
         set
         {
             if (Price_Value != value)
@@ -104,7 +110,7 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     }
     public CurrencyKind Price_Kind
     {
-        get => Model.Price.Kind; 
+        get => Model.Price.Kind;
         set
         {
             if (Price_Kind != value)
@@ -118,100 +124,127 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
     }
     public int CountryId
     {
-        get => Model.CountryId; 
+        get => Model.CountryId;
         set
         {
             if (CountryId != value)
             {
-                Model.CountryId = value; 
+                Model.CountryId = value;
                 OnPropertyChanged("CountryId");
             }
         }
     }
-    public PersonNames? Owner
+    public bool HasOwner
     {
-        get => Model.Owner; 
+        get => Model.HasOwner;
+        set
+        {
+            if (HasOwner != value)
+            {
+                Model.HasOwner = value;
+                OnPropertyChanged("HasOwner");
+            }
+        }
+    }
+    public PersonNames Owner
+    {
+        get => Model.Owner;
         set
         {
             if (Owner != value)
             {
-                Model.Owner = value; 
+                Model.Owner = value;
                 OnPropertyChanged("Owner");
             }
         }
     }
     public string Owner_FirstName
     {
-        get => Model.Owner.Value.FirstName; 
+        get => Model.Owner.FirstName;
         set
         {
             if (Owner_FirstName != value)
             {
-                var p = Model.Owner.Value;
-                p.FirstName = value;
-                Model.Owner = p;
+                Model.Owner.FirstName = value;
                 OnPropertyChanged("Owner_FirstName");
             }
         }
     }
     public string Owner_LastName
     {
-        get => Model.Owner.Value.LastName; 
+        get => Model.Owner.LastName;
         set
         {
             if (Owner_LastName != value)
             {
-                var p = Model.Owner.Value;
-                p.LastName = value;
-                Model.Owner = p;
+                Model.Owner.LastName = value;
                 OnPropertyChanged("Owner_LastName");
             }
         }
     }
     public EngineKind EngineKind
     {
-        get => Model.EngineKind; 
+        get => Model.EngineKind;
         set
         {
             if (EngineKind != value)
             {
-                Model.EngineKind = value; 
+                Model.EngineKind = value;
                 OnPropertyChanged("EngineKind");
             }
         }
     }
     public float KilometersTravelled
     {
-        get => Model.KilometersTravelled; 
+        get => Model.KilometersTravelled;
         set
         {
             if (KilometersTravelled != value)
             {
-                Model.KilometersTravelled = value; 
+                Model.KilometersTravelled = value;
                 OnPropertyChanged("KilometersTravelled");
             }
         }
     }
     public int NumWheels
     {
-        get => Model.NumWheels; 
+        get => Model.NumWheels;
         set
         {
             if (NumWheels != value)
             {
-                Model.NumWheels = value; 
+                Model.NumWheels = value;
                 OnPropertyChanged("NumWheels");
             }
         }
     }
+
     public RGBAColor Color
     {
-        get => Model.Color; 
+        get => Model.Color;
         set
         {
             if (Color != value)
             {
-                Model.Color = value; 
+                Model.Color = value;
+                OnPropertyChanged("Color");
+            }
+        }
+    }
+
+    public Color ExtColor
+    {
+        get
+        {
+            var c = Model.Color;
+            return System.Drawing.Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
+        }
+        set
+        {
+            var c = ExtColor;
+            if (c != value)
+            {
+                Model.Color = new RGBAColor(c.R, c.G, c.B, c.A);
                 OnPropertyChanged("Color");
             }
         }
@@ -219,12 +252,12 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
 
     public byte Color_Red
     {
-        get => (byte) Model.Color.Red; 
+        get => (byte)Model.Color.Red;
         set
         {
             if (Color.Red != value)
             {
-                Model.Color.Red = value; 
+                Model.Color.Red = value;
                 OnPropertyChanged("Color_Red");
             }
         }
@@ -232,12 +265,12 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
 
     public byte Color_Green
     {
-        get => (byte) Model.Color.Green; 
+        get => (byte)Model.Color.Green;
         set
         {
             if (Color.Green != value)
             {
-                Model.Color.Green = value; 
+                Model.Color.Green = value;
                 OnPropertyChanged("Color_Green");
             }
         }
@@ -245,12 +278,12 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
 
     public byte Color_Blue
     {
-        get => (byte) Model.Color.Blue; 
+        get => (byte)Model.Color.Blue;
         set
         {
             if (Color.Blue != value)
             {
-                Model.Color.Blue = value; 
+                Model.Color.Blue = value;
                 OnPropertyChanged("Color_Blue");
             }
         }
@@ -258,12 +291,12 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
 
     public byte Color_Alpha
     {
-        get => (byte) Model.Color.Alpha; 
+        get => (byte)Model.Color.Alpha;
         set
         {
             if (Color.Alpha != value)
             {
-                Model.Color.Alpha = value; 
+                Model.Color.Alpha = value;
                 OnPropertyChanged("Color_Alpha");
             }
         }
@@ -290,54 +323,6 @@ public class CarModelBindingSource : System.ComponentModel.INotifyPropertyChange
             var errors = ValidationResult.Errors.Where(p => p.PropertyName == columnName);
             return string.Join(Environment.NewLine, errors);
         }
-    }
-}
-
-
-// Might want to pass this thing an interface with all of the properties instead.
-// But then the CarModel would also have to implement those... It sucks either way...
-public class CarValidator : AbstractValidator<CarModelBindingSource>
-{
-    private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
-
-    public CarValidator(CarDependenciesRegistry registry)
-    {
-        RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Length);
-        RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Length);
-        RuleFor(x => x.Color_Alpha).Equal((byte) 0xff);
-        RuleFor(x => x.KilometersTravelled).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Price_Value).GreaterThan(0);
-        RuleFor(x => x.ManufacturedDate)
-            .GreaterThan(new DateTime(year: 1886, month: 1, day: 29))
-            .LessThanOrEqualTo(_ => DateTime.Now);
-        RuleFor(x => x.NumWheels).GreaterThan(0);
-        RuleFor(x => x.Owner).Must((model, x, context) =>
-        {
-            if (!x.HasValue)
-                return true;
-
-            var names = x.Value;
-
-            bool result = true;
-            const string commonString = " does not match regex, must start with a capital letter.";
-
-            void Validate(string prop, string propNormalCasing, string value)
-            {
-                if (value is null)
-                {
-                    context.AddFailure(prop, "No " + propNormalCasing + ".");
-                    result = false;
-                }
-                else if (!_NameRegex.IsMatch(value))
-                {
-                    context.AddFailure(prop, "The " + propNormalCasing + commonString);
-                    result = false;
-                }
-            }
-            Validate("Owner_FirstName", "first name", names.FirstName);
-            Validate("Owner_LastName", "last name", names.LastName);
-            return result;
-        });
     }
 }
 

@@ -8,7 +8,11 @@
       "Kind": "$"
     },
     "CountryId": 97,
-    "Owner": null,
+    "HasOwner": false,
+    "Owner": {
+      "FirstName": null,
+      "LastName": null
+    },
     "EngineKind": "Gas",
     "KilometersTravelled": 22208.0,
     "NumWheels": 8,
@@ -25,7 +29,11 @@
       "Kind": "€"
     },
     "CountryId": 83,
-    "Owner": null,
+    "HasOwner": false,
+    "Owner": {
+      "FirstName": null,
+      "LastName": null
+    },
     "EngineKind": "Diesel",
     "KilometersTravelled": 92672.0,
     "NumWheels": 4,
@@ -42,6 +50,7 @@
       "Kind": "$"
     },
     "CountryId": 7,
+    "HasOwner": true,
     "Owner": {
       "FirstName": "John",
       "LastName": "Smith"
@@ -62,7 +71,11 @@
       "Kind": "€"
     },
     "CountryId": 109,
-    "Owner": null,
+    "HasOwner": false,
+    "Owner": {
+      "FirstName": null,
+      "LastName": null
+    },
     "EngineKind": "Diesel",
     "KilometersTravelled": 76508.0,
     "NumWheels": 8,
@@ -79,6 +92,7 @@
       "Kind": "$"
     },
     "CountryId": 56,
+    "HasOwner": true,
     "Owner": {
       "FirstName": "Maria",
       "LastName": "Miller"

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,14 +20,94 @@ public class DirectGet<T> : IGet<T> where T : class
 
 public class CarDatabase
 {
-    public readonly List<CarModel> Cars;
+    public readonly ObservableCollection<CarModel> Cars;
     public readonly CarDependenciesRegistry Registry;
+    public readonly ObservableCollection<CarModelBindingSource> CarBindings;
+    private readonly CarValidator _validator;
 
-    public CarDatabase(List<CarModel> cars, CarDependenciesRegistry registry)
+    public CarDatabase(ObservableCollection<CarModel> cars, CarDependenciesRegistry registry)
     {
         Cars = cars;
         Registry = registry;
+
+        var validator = new CarValidator(registry);
+        _validator = validator;
+        CarBindings = new(cars.Select(c => new CarModelBindingSource(validator, c)));
+
+        Cars.CollectionChanged += (sender, e) =>
+        {
+            Debug.Assert(sender is not null);
+            var collection = (ObservableCollection<CarModel>) sender;
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    CarBindings.Add(new CarModelBindingSource(_validator, collection[^1]));
+                    break;
+                }
+                case NotifyCollectionChangedAction.Move:
+                {
+                    CarBindings.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    break;
+                }
+                // case NotifyCollectionChangedAction.Replace:
+                // {
+                //     Debug.Fail("Not supported");
+                //     break;
+                // }
+                // case NotifyCollectionChangedAction.Reset:
+                // {
+                //     Debug.Fail("Not supported");
+                //     break;
+                // }
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    CarBindings.RemoveAt(e.OldStartingIndex);
+                    break;
+                }
+                default:
+                {
+                    Debug.Fail("Unsupported case " + e.Action);
+                    break;
+                }
+            }
+        };
+
+        CarBindings.CollectionChanged += (sender, e) =>
+        {
+            Debug.Assert(sender is not null);
+            var collection = (ObservableCollection<CarModelBindingSource>) sender;
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    // Should have been added manually at this point.
+                    break;
+                }
+                case NotifyCollectionChangedAction.Move:
+                {
+                    Cars.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    break;
+                }
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    Cars.RemoveAt(e.OldStartingIndex);
+                    break;
+                }
+                default:
+                {
+                    Debug.Fail("Unsupported case " + e.Action);
+                    break;
+                }
+            }
+        };
     }
+}
+
+public static class PropertyChangedEventHandlerExtensions
+{
 }
 
 public partial class Form1 : Window
@@ -35,7 +118,7 @@ public partial class Form1 : Window
     {
         _database = database;
         InitializeComponent();
-        InitializeComponent2();
+        // InitializeComponent2();
     }
     
     private void InitializeComponent2()
@@ -79,6 +162,7 @@ public partial class Form1 : Window
             binding.Mode = BindingMode.TwoWay;
             binding.Source = carModelBindingSource;
             binding.ValidatesOnDataErrors = true;
+            binding.NotifyOnValidationError = true;
             return binding;
         }
         {
@@ -94,7 +178,6 @@ public partial class Form1 : Window
         dispatcherTimer.Tick += (_, _) =>
         {
             var t = this;
-            // carModelBindingSource.NumberplateText = numberplateTextBox.Name + firstNameTextBox.Name;
         };
         dispatcherTimer.Interval = TimeSpan.FromMilliseconds(1000);
         dispatcherTimer.Start();

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using CarApp.Assets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -17,13 +16,13 @@ public class CarModel
     public int ManufacturerId; // { get; set; }
     public Currency Price; // { get; set; }
     public int CountryId; // { get; set; }
-    public PersonNames? Owner; // { get; set; }
+    public bool HasOwner; // { get; set; }
+    public PersonNames Owner; // { get; set; }
     public EngineKind EngineKind; // { get; set; }
     public float KilometersTravelled; // { get; set; }
     public int NumWheels; // { get; set; }
     public RGBAColor Color; // { get; set; }
-
-    public bool IsOwned => Owner.HasValue;
+    public CarModel Copy() => (CarModel) this.MemberwiseClone();
 }
 
 public record struct PersonNames
@@ -127,9 +126,9 @@ public class OnlyFieldsResolver : DefaultContractResolver
         this.SerializeCompilerGeneratedMembers = true;
     }
 
-    protected override JsonContract CreateContract(Type objectType)
+    protected override JsonStringContract CreateStringContract(Type objectType)
     {
-        return base.CreateContract(objectType);
+        return base.CreateStringContract(objectType);
     }
 
     protected override List<MemberInfo> GetSerializableMembers(Type objectType)
@@ -346,6 +345,7 @@ public static class CarModelUtils
         
         if (rng.NextDouble() > 0.5f)
         {
+            car.HasOwner = true;
             car.Owner = new PersonNames
             {
                 FirstName = firstNames[(rng.Next() % firstNames.Length)],
