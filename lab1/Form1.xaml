@@ -38,40 +38,26 @@
 		</Grid.RowDefinitions>
 
         <Grid.Resources>
-            <local:MyDataTemplateSelector x:Key="myDataTemplateSelector"/>
-
+            <DataTemplate x:Key="_datePicker">
+                <DatePicker SelectedDate="{Binding}"/>
+            </DataTemplate>
             <DataTemplate x:Key="datePicker">
                 <StackPanel>
-                    <!-- Try it with a concrete binding path, to see if it works at all -->
-                    <DatePicker SelectedDate="{Binding Path=[0].ManufacturedDate}"/>
-
-                    <!-- This one should work tho in theory -->
-                    <!-- <DatePicker SelectedDate="{Binding Path=(local:Properties.TemplateName)}"/> -->
+                    <ContentPresenter ContentTemplate="{StaticResource _datePicker}" 
+                        Content="{Binding Path=(local:Properties.TemplateBinding),
+                            RelativeSource={RelativeSource AncestorType={x:Type DataGridTemplateColumn}}}" />
                 </StackPanel>
             </DataTemplate>
-            <DataTemplate x:Key="colorPicker">
-                <xctk:ColorPicker SelectedColor="{Binding}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="enumPicker">
-            </DataTemplate>
-            <DataTemplate x:Key="dbPicker">
-            </DataTemplate>
         </Grid.Resources>
-        
-        <DatePicker
-            Grid.Row="0"
-            Grid.Column="1"
-            SelectedDate="{Binding [0].ManufacturedDate}"/>
 
         <DataGrid Name="CarDataGrid"
                   Grid.Row="0" Grid.Column="0"
-                  AutoGenerateColumns="false"
-                  ItemTemplateSelector="{StaticResource myDataTemplateSelector}">
+                  AutoGenerateColumns="false">
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Header="ManufacturedOn"
-                    local:Properties.TemplateBinding="ManufacturedDate"
-                    local:Properties.TemplateName="datePicker" />
+                    local:Properties.TemplateBinding="{Binding Path=ManufacturedDate}"
+                    CellTemplate="{StaticResource datePicker}"/>
             </DataGrid.Columns>
         </DataGrid>
         <!-- <Label Content="Color" />

@@ -44,15 +44,15 @@ public class GenericProperty<TTarget, TProperty, TSelf> where TTarget : Dependen
 public static partial class Properties
 {
     private static readonly DependencyProperty _TemplateBinding = DependencyProperty.RegisterAttached(
-        nameof(TemplateBinding), ownerType: typeof(DataGridColumn), propertyType: typeof(string));
+        nameof(TemplateBinding), ownerType: typeof(DataGridColumn), propertyType: typeof(Binding));
     public static DependencyProperty TemplateBinding => _TemplateBinding;
 
-    public static string GetTemplateBinding(DataGridColumn target)
+    public static Binding GetTemplateBinding(DataGridColumn target)
     {
-        return (string) target.GetValue(TemplateBinding);
+        return (Binding) target.GetValue(TemplateBinding);
     }
 
-    public static void SetTemplateBinding(DataGridColumn target, string value)
+    public static void SetTemplateBinding(DataGridColumn target, Binding value)
     {
         target.SetValue(TemplateBinding, value);
     }
