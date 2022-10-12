@@ -11,9 +11,9 @@ namespace CarApp;
 
 public class CarDatabase
 {
-    public readonly ObservableCollection<CarModel> Cars;
-    public readonly CarDependenciesRegistry Registry;
-    public readonly ObservableViewModelCollection<CarViewModel, CarModel> CarBindings;
+    public ObservableCollection<CarModel> Cars { get; }
+    public CarDependenciesRegistry Registry { get; }
+    public ObservableViewModelCollection<CarViewModel, CarModel> CarBindings { get; }
 
     public CarDatabase(ObservableCollection<CarModel> cars, CarDependenciesRegistry registry)
     {
@@ -66,10 +66,11 @@ public partial class Form1 : Window
     {
         _ = Properties.TemplateBinding;
         _database = database;
+        
+        DataContext = database;
         InitializeComponent();
         // InitializeComponent2();
 
-        CarDataGrid.ItemsSource = database.CarBindings;
     }
     
     private void InitializeComponent2()
