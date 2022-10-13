@@ -1,7 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Threading;
 using CarApp.Model;
 
 namespace CarApp;
@@ -38,18 +40,25 @@ public class GenericProperty<TTarget, TProperty, TSelf> where TTarget : Dependen
 
 public static partial class Properties
 {
-    private static readonly DependencyProperty _TemplateBinding = DependencyProperty.RegisterAttached(
-        nameof(TemplateBinding), ownerType: typeof(DataGridColumn), propertyType: typeof(Binding));
-    public static DependencyProperty TemplateBinding => _TemplateBinding;
+    private static DependencyProperty CreateProperty<T>(string name, PropertyMetadata metadata = null)
+    {
+        return DependencyProperty.RegisterAttached(
+            name,
+            ownerType: typeof(Properties),
+            propertyType: typeof(T),
+            defaultMetadata: metadata);
+    }
+
+    private static readonly DependencyProperty TemplateBindingProperty = CreateProperty<Binding>("TemplateBinding");
 
     public static Binding GetTemplateBinding(DataGridColumn target)
     {
-        return (Binding) target.GetValue(TemplateBinding);
+        return (Binding) target.GetValue(TemplateBindingProperty);
     }
 
     public static void SetTemplateBinding(DataGridColumn target, Binding value)
     {
-        target.SetValue(TemplateBinding, value);
+        target.SetValue(TemplateBindingProperty, value);
     }
 }
 
@@ -59,12 +68,21 @@ public partial class Form1 : Window
 
     public Form1(CarDatabase database)
     {
-        _ = Properties.TemplateBinding;
         _database = database;
         
         DataContext = database;
         InitializeComponent();
         // InitializeComponent2();
+
+        var dispatcherTimer = new DispatcherTimer();
+        dispatcherTimer.Tick += (_, _) =>
+        {
+            database.CarBindings[0].Price_Value += 10;
+            database.CarBindings[0].Owner_FirstName = "anton";
+            database.CarBindings[0].Owner_LastName += "a";
+        };
+        dispatcherTimer.Interval = TimeSpan.FromMilliseconds(3000);
+        dispatcherTimer.Start();
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false

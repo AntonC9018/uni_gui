@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
@@ -58,7 +58,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (NumberplateText != value)
             {
                 Model.NumberplateText = value;
-                OnPropertyChanged("NumberplateText");
+                OnPropertyChanged(nameof(NumberplateText));
             }
         }
     }
@@ -70,7 +70,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (ManufacturedDate != value)
             {
                 Model.ManufacturedDate = value;
-                OnPropertyChanged("ManufacturedDate");
+                OnPropertyChanged(nameof(ManufacturedDate));
             }
         }
     }
@@ -82,7 +82,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (ManufacturerId != value)
             {
                 Model.ManufacturerId = value;
-                OnPropertyChanged("ManufacturerId");
+                OnPropertyChanged(nameof(ManufacturerId));
             }
         }
     }
@@ -94,7 +94,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Price != value)
             {
                 Model.Price = value;
-                OnPropertyChanged("Price");
+                OnPropertyChanged(nameof(Price));
             }
         }
     }
@@ -108,7 +108,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
                 var p = Model.Price;
                 p.Value = value;
                 Model.Price = p;
-                OnPropertyChanged("Price_Value");
+                OnPropertyChanged(nameof(Price_Value));
             }
         }
     }
@@ -123,10 +123,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
                 var p = Model.Price;
                 p.Kind = value;
                 Model.Price = p;
-                OnPropertyChanged("Price_Kind");
+                OnPropertyChanged(nameof(Price_Kind));
 
                 // see explanation below.
-                OnPropertyChanged("Price_KindIndex");
+                OnPropertyChanged(nameof(Price_KindIndex));
             }
         }
     }
@@ -139,7 +139,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (CountryId != value)
             {
                 Model.CountryId = value;
-                OnPropertyChanged("CountryId");
+                OnPropertyChanged(nameof(CountryId));
             }
         }
     }
@@ -151,7 +151,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (HasOwner != value)
             {
                 Model.HasOwner = value;
-                OnPropertyChanged("HasOwner");
+                OnPropertyChanged(nameof(HasOwner));
             }
         }
     }
@@ -160,11 +160,21 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
         get => Model.Owner;
         set
         {
-            if (Owner != value)
+            bool areDifferent = false;
+            if (Owner_FirstName != value.FirstName)
             {
-                Model.Owner = value;
-                OnPropertyChanged("Owner");
+                Model.Owner.FirstName = value.FirstName;
+                areDifferent = true;
+                OnPropertyChanged(nameof(Owner_FirstName));
             }
+            if (Owner_LastName != value.LastName)
+            {
+                Model.Owner.LastName = value.LastName;
+                areDifferent = true;
+                OnPropertyChanged(nameof(Owner_LastName));
+            }
+            if (areDifferent)
+                OnPropertyChanged(nameof(Owner));
         }
     }
     public string Owner_FirstName
@@ -175,7 +185,8 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Owner_FirstName != value)
             {
                 Model.Owner.FirstName = value;
-                OnPropertyChanged("Owner_FirstName");
+                OnPropertyChanged(nameof(Owner));
+                OnPropertyChanged(nameof(Owner_FirstName));
             }
         }
     }
@@ -187,7 +198,8 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Owner_LastName != value)
             {
                 Model.Owner.LastName = value;
-                OnPropertyChanged("Owner_LastName");
+                OnPropertyChanged(nameof(Owner));
+                OnPropertyChanged(nameof(Owner_LastName));
             }
         }
     }
@@ -199,10 +211,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (EngineKind != value)
             {
                 Model.EngineKind = value;
-                OnPropertyChanged("EngineKind");
+                OnPropertyChanged(nameof(EngineKind));
                 
                 // see explanation below.
-                OnPropertyChanged("EngineKindIndex");
+                OnPropertyChanged(nameof(EngineKindIndex));
             }
         }
     }
@@ -215,7 +227,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (KilometersTravelled != value)
             {
                 Model.KilometersTravelled = value;
-                OnPropertyChanged("KilometersTravelled");
+                OnPropertyChanged(nameof(KilometersTravelled));
             }
         }
     }
@@ -227,7 +239,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (NumWheels != value)
             {
                 Model.NumWheels = value;
-                OnPropertyChanged("NumWheels");
+                OnPropertyChanged(nameof(NumWheels));
             }
         }
     }
@@ -240,26 +252,28 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Color != value)
             {
                 Model.Color = value;
-                OnPropertyChanged("Color");
+                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(Windows_Media_Color));
+                OnPropertyChanged(nameof(Color_Red));
+                OnPropertyChanged(nameof(Color_Green));
+                OnPropertyChanged(nameof(Color_Blue));
+                OnPropertyChanged(nameof(Color_Alpha));
             }
         }
     }
 
-    public Color ExtColor
+    public System.Windows.Media.Color Windows_Media_Color
     {
         get
         {
             var c = Model.Color;
-            return System.Drawing.Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
+            return System.Windows.Media.Color.FromArgb(
+                (byte) c.Alpha, (byte) c.Red, (byte) c.Green, (byte) c.Blue);
         }
         set
         {
-            var c = ExtColor;
-            if (c != value)
-            {
-                Model.Color = new RGBAColor(c.R, c.G, c.B, c.A);
-                OnPropertyChanged("Color");
-            }
+            var c = Windows_Media_Color;
+            Color = new RGBAColor(c.R, c.G, c.B, c.A);
         }
     }
 
@@ -271,7 +285,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Color.Red != value)
             {
                 Model.Color.Red = value;
-                OnPropertyChanged("Color_Red");
+                
+                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(Windows_Media_Color));
+                OnPropertyChanged(nameof(Color_Red));
             }
         }
     }
@@ -284,7 +301,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Color.Green != value)
             {
                 Model.Color.Green = value;
-                OnPropertyChanged("Color_Green");
+                
+                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(Windows_Media_Color));
+                OnPropertyChanged(nameof(Color_Green));
             }
         }
     }
@@ -297,7 +317,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Color.Blue != value)
             {
                 Model.Color.Blue = value;
-                OnPropertyChanged("Color_Blue");
+                
+                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(Windows_Media_Color));
+                OnPropertyChanged(nameof(Color_Blue));
             }
         }
     }
@@ -310,7 +333,10 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             if (Color.Alpha != value)
             {
                 Model.Color.Alpha = value;
-                OnPropertyChanged("Color_Alpha");
+
+                OnPropertyChanged(nameof(Color));
+                OnPropertyChanged(nameof(Windows_Media_Color));
+                OnPropertyChanged(nameof(Color_Alpha));
             }
         }
     }
@@ -329,11 +355,46 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             return errors;
         }
     }
+
+
+    private static readonly Dictionary<string, string[]> _LazyPropertyMap = new();
+
     public string this[string columnName]
     {
         get
         {
-            var errors = ValidationResult.Errors.Where(p => p.PropertyName == columnName);
+            static string[] GetActualColumnName(string columnName)
+            {
+                if (_LazyPropertyMap.TryGetValue(columnName, out var v))
+                    return v;
+
+                return _LazyPropertyMap[columnName] = columnName switch
+                {
+                    nameof(Color) => new[]
+                    {
+                        nameof(Color_Alpha),
+                        nameof(Color_Blue),
+                        nameof(Color_Red),
+                        nameof(Color_Green),
+                    },
+                    nameof(Owner) => new[]
+                    {
+                        nameof(Owner_FirstName),
+                        nameof(Owner_LastName),
+                    },
+                    nameof(Price) => new[]
+                    {
+                        nameof(Price_Kind),
+                        nameof(Price_Value),
+                    },
+                    nameof(Price_KindIndex) => new[] { nameof(Price_Kind) },
+                    nameof(EngineKindIndex) => new[] { nameof(EngineKind) },
+                    _ => new[] { columnName },
+                };
+            }
+
+            string[] actualColumnNames = GetActualColumnName(columnName);
+            var errors = ValidationResult.Errors.Where(p => Array.IndexOf(actualColumnNames, p.PropertyName) != -1);
             return string.Join(Environment.NewLine, errors);
         }
     }

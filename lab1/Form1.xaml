@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarApp"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
@@ -24,41 +24,50 @@
                 </Border>
             </DockPanel>
         </ControlTemplate>
+        
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="IsTabStop" Value="False"/>
+        </Style>
     </Window.Resources>
 
-    <Grid Name="Root">
-        <Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto" />
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-		</Grid.RowDefinitions>
-
+    <Grid>
         <DataGrid Name="CarDataGrid"
                   ItemsSource="{Binding Path=CarBindings}"
                   Grid.Row="0" Grid.Column="0"
-                  AutoGenerateColumns="false">
+                  AutoGenerateColumns="false"
+                  HorizontalAlignment="Stretch"
+                  >
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Manufactured On">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <DatePicker SelectedDate="{Binding ManufacturedDate, Mode=TwoWay}"/>
+                            <DatePicker
+                                SelectedDate="{Binding ManufacturedDate, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 
-                <DataGridTextColumn Header="Numberplate Text" Binding="{Binding NumberplateText, Mode=TwoWay}"/>
+                <DataGridTemplateColumn Header="Numberplate Text">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                local:Properties.Focus="True"
+                                Text="{Binding NumberplateText, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 
                 <DataGridTemplateColumn Header="Manufacturer">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
+                                local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Manufacturers}"
-                                SelectedIndex="{Binding ManufacturerId, Mode=TwoWay}"/>
+                                SelectedIndex="{Binding ManufacturerId, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -67,8 +76,10 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
+                                local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Countries}"
-                                SelectedIndex="{Binding CountryId, Mode=TwoWay}"/>
+                                SelectedIndex="{Binding CountryId, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -77,8 +88,10 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
+                                local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.EngineKinds}"
-                                SelectedIndex="{Binding Path=EngineKindIndex, Mode=TwoWay}"/>
+                                SelectedIndex="{Binding Path=EngineKindIndex, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -87,22 +100,43 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBox Text="{Binding Price_Value, StringFormat='#.00', Mode=TwoWay}" />
+                                <toolkit:DoubleUpDown
+                                    local:Properties.Focus="True"
+                                    Value="{Binding KilometersTravelled, StringFormat='#.00', Mode=TwoWay}"
+                                    Increment="10"
+                                    Minimum="0.01"
+                                    />
                                 <ComboBox
                                     ItemsSource="{Binding Path=Domain.CurrencyKinds}"
-                                    SelectedIndex="{Binding Price_KindIndex, Mode=TwoWay}"/>
+                                    SelectedIndex="{Binding Price_KindIndex, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                    />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridCheckBoxColumn Header="Has Owner"
-                    Binding="{Binding HasOwner, UpdateSourceTrigger=PropertyChanged}" />
+                <DataGridTemplateColumn Header="Has Owner">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                local:Properties.Focus="True"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding HasOwner, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                     
                 <DataGridTemplateColumn Header="Owner First Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                                <TextBox Text="{Binding Owner_FirstName}" IsEnabled="{Binding HasOwner}"/>
+                            <TextBox
+                                local:Properties.Focus="True"
+                                Text="{Binding Owner_FirstName, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                IsEnabled="{Binding HasOwner}"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -110,7 +144,36 @@
                 <DataGridTemplateColumn Header="Owner Last Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                                <TextBox Text="{Binding Owner_LastName}" IsEnabled="{Binding HasOwner}"/>
+                            <TextBox
+                                local:Properties.Focus="True"
+                                Text="{Binding Owner_LastName, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                IsEnabled="{Binding HasOwner}"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="Color">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <toolkit:ColorPicker
+                                local:Properties.Focus="True"
+                                SelectedColor="{Binding Windows_Media_Color, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Kilometers Traveled">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <toolkit:IntegerUpDown
+                                local:Properties.Focus="True"
+                                Value="{Binding KilometersTravelled, StringFormat='#', Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Increment="100"
+                                Minimum="0"
+                                />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

@@ -51,23 +51,25 @@ public class CarValidator : AbstractValidator<ICarModel>
                 return true;
 
             bool result = true;
-            const string commonString = " does not match regex, must start with a capital letter.";
-
-            void Validate(string prop, string propNormalCasing, string value)
+            
+            static bool ValidateName(string prop, string propNormalCasing, string value, ValidationContext<ICarModel> context)
             {
+                const string commonString = " does not match regex, must start with a capital letter.";
                 if (value is null)
                 {
                     context.AddFailure(prop, "No " + propNormalCasing + ".");
-                    result = false;
+                    return false;
                 }
                 else if (!_NameRegex.IsMatch(value))
                 {
                     context.AddFailure(prop, "The " + propNormalCasing + commonString);
-                    result = false;
+                    return false;
                 }
+                return true;
             }
-            Validate(nameof(ICarModel.Owner_FirstName), "first name", x.FirstName);
-            Validate(nameof(ICarModel.Owner_LastName), "last name", x.LastName);
+            
+            result = result || ValidateName(nameof(ICarModel.Owner_FirstName), "first name", x.FirstName, context);
+            result = result || ValidateName(nameof(ICarModel.Owner_LastName), "last name", x.LastName, context);
             return result;
         });
     }
