@@ -28,8 +28,6 @@ public interface ICarModel
     byte Color_Alpha { get; set; }
 }
 
-// Might want to pass this thing an interface with all of the properties instead.
-// But then the CarModel would also have to implement those... It sucks either way...
 public class CarValidator : AbstractValidator<ICarModel>
 {
     private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
