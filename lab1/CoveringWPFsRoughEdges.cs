@@ -8,6 +8,34 @@ using System.Windows.Markup;
 
 namespace CarApp;
 
+
+public static partial class Properties
+{
+    private static DependencyProperty CreateProperty<T>(string name, PropertyMetadata metadata = null)
+    {
+        return DependencyProperty.RegisterAttached(
+            name,
+            ownerType: typeof(Properties),
+            propertyType: typeof(T),
+            defaultMetadata: metadata);
+    }
+}
+
+public static partial class Properties
+{
+    private static readonly DependencyProperty TemplateBindingProperty = CreateProperty<Binding>("TemplateBinding");
+
+    public static Binding GetTemplateBinding(DataGridColumn target)
+    {
+        return (Binding) target.GetValue(TemplateBindingProperty);
+    }
+
+    public static void SetTemplateBinding(DataGridColumn target, Binding value)
+    {
+        target.SetValue(TemplateBindingProperty, value);
+    }
+}
+
 public static partial class Properties
 {
     public static readonly DependencyProperty TemplateNameProperty = CreateProperty<string>("TemplateName");
