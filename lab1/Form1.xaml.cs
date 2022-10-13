@@ -1,10 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Threading;
 using CarApp.Model;
 
 namespace CarApp;
@@ -12,16 +9,14 @@ namespace CarApp;
 public class CarDatabase
 {
     public ObservableCollection<CarModel> Cars { get; }
-    public CarDependenciesRegistry Registry { get; }
+    public ICarDomain Domain { get; }
     public ObservableViewModelCollection<CarViewModel, CarModel> CarBindings { get; }
 
-    public CarDatabase(ObservableCollection<CarModel> cars, CarDependenciesRegistry registry)
+    public CarDatabase(ObservableCollection<CarModel> cars, ICarDomain domain)
     {
         Cars = cars;
-        Registry = registry;
-
-        var validator = new CarValidator(registry);
-        CarBindings = new(cars, c => new CarViewModel(validator, c));
+        Domain = domain;
+        CarBindings = new(cars, c => new CarViewModel(Domain, c));
     }
 }
 
@@ -70,69 +65,6 @@ public partial class Form1 : Window
         DataContext = database;
         InitializeComponent();
         // InitializeComponent2();
-
-    }
-    
-    private void InitializeComponent2()
-    {
-        var container = (Panel) this.Content;
-
-        var text = new TextBlock();
-        text.Text = "Hello world";
-        Grid.SetColumn(text, 0);
-        container.Children.Add(text);
-
-        var validationTemplate = (ControlTemplate) this.Resources["validationTemplate"];
-        Debug.Assert(validationTemplate is not null);
-
-        var numberplateTextBox = new TextBox();
-        numberplateTextBox.Text = "Some default text";
-        Grid.SetColumn(numberplateTextBox, 1);
-        Grid.SetRow(numberplateTextBox, 0);
-        container.Children.Add(numberplateTextBox);
-        Validation.SetErrorTemplate(numberplateTextBox, validationTemplate);
-
-        var firstNameTextBox = new TextBox();
-        firstNameTextBox.Text = "Some default text";
-        Grid.SetColumn(firstNameTextBox, 1);
-        Grid.SetRow(firstNameTextBox, 1);
-        container.Children.Add(firstNameTextBox);
-        Validation.SetErrorTemplate(firstNameTextBox, validationTemplate);
-
-        var carModel = new CarModel();
-        var validator = new CarValidator(_database.Registry);
-        var carModelBindingSource = new CarViewModel(validator);
-        carModelBindingSource.Model = carModel;
-
-        carModelBindingSource.NumberplateText = "Hello";
-        carModelBindingSource.Owner = new PersonNames();
-
-        Binding CreateBinding(string propPath)
-        {
-            var binding = new Binding(propPath);
-            binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            binding.Mode = BindingMode.TwoWay;
-            binding.Source = carModelBindingSource;
-            binding.ValidatesOnDataErrors = true;
-            binding.NotifyOnValidationError = true;
-            return binding;
-        }
-        {
-            var binding = CreateBinding(nameof(carModelBindingSource.NumberplateText));
-            BindingOperations.SetBinding(numberplateTextBox, TextBox.TextProperty, binding);
-        }
-        {
-            var binding = CreateBinding(nameof(carModelBindingSource.Owner_FirstName));
-            BindingOperations.SetBinding(firstNameTextBox, TextBox.TextProperty, binding);
-        }
-
-        var dispatcherTimer = new DispatcherTimer();
-        dispatcherTimer.Tick += (_, _) =>
-        {
-            var t = this;
-        };
-        dispatcherTimer.Interval = TimeSpan.FromMilliseconds(1000);
-        dispatcherTimer.Start();
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false

@@ -37,7 +37,7 @@ public enum EngineKind
     Bio,
     Gas,
     Electric,
-    Count,
+    _Count,
 }
 
 public record struct RGBAColor
@@ -104,7 +104,7 @@ public enum CurrencyKind
 {
     USDollar,
     Euro,
-    Count,
+    _Count,
 }
 
 public record struct Currency
@@ -164,6 +164,30 @@ public sealed class HexStringJsonConverter : JsonConverter
     }
 }
 
+public static class CurrencyKindHelper
+{
+    public static readonly string[] Symbols;
+
+    static CurrencyKindHelper()
+    {
+        Symbols = new string[(int) CurrencyKind._Count];
+        Symbols[(int) CurrencyKind.Euro] = "€";
+        Symbols[(int) CurrencyKind.USDollar] = "$";
+        Debug.Assert(Symbols.All(s => s is not null));
+    }
+
+    public static string ToSymbol(this CurrencyKind kind)
+    {
+        return Symbols[(int) kind];
+    }
+
+    public static CurrencyKind? FromSymbol(string symbol)
+    {
+        int i = Array.IndexOf(Symbols, symbol);
+        return i == -1 ? null : ((CurrencyKind) i);
+    }
+}
+
 public sealed class CurrencyKindConverter : JsonConverter
 {
     public static readonly CurrencyKindConverter Instance = new CurrencyKindConverter();
@@ -176,23 +200,9 @@ public sealed class CurrencyKindConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        switch ((CurrencyKind) value)
-        {
-            case CurrencyKind.USDollar:
-            {
-                writer.WriteValue("$");
-                break;
-            }
-            case CurrencyKind.Euro:
-            {
-                writer.WriteValue("€");
-                break;
-            }
-            default:
-            {
-                throw new JsonSerializationException("Invalid currency kind");
-            }
-        }
+        string s = ((CurrencyKind) value).ToSymbol();
+        if (s is null)
+            throw new JsonSerializationException("Invalid currency kind");
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -200,12 +210,10 @@ public sealed class CurrencyKindConverter : JsonConverter
         var value = reader.Value;
         if (value is not string str)
             throw new JsonSerializationException("Expected a currency string.");
-        switch (str)
-        {
-            case "$": return CurrencyKind.USDollar;
-            case "€": return CurrencyKind.Euro;
-            default: throw new JsonSerializationException("Unknown currency type.");
-        }
+        var kind = CurrencyKindHelper.FromSymbol(str);
+        if (!kind.HasValue)
+            throw new JsonSerializationException("Unknown currency type.");
+        return kind.Value;
     }
 }
 
@@ -314,7 +322,7 @@ public static class CarModelUtils
         ReadOnlySpan<string> lastNames)
     {
         var car = new CarModel();
-        car.EngineKind = (EngineKind) (rng.Next() % (int) EngineKind.Count);
+        car.EngineKind = (EngineKind) (rng.Next() % (int) EngineKind._Count);
         car.CountryId = rng.Next() % carRegistry.Countries.Length;
         car.ManufacturerId = rng.Next() % carRegistry.Manufacturers.Length;
 
@@ -340,7 +348,7 @@ public static class CarModelUtils
         car.Price = new Currency()
         {
             Value = (decimal) rng.Range(1_000, 100_000),
-            Kind = (CurrencyKind) (rng.Next() % (int) CurrencyKind.Count),
+            Kind = (CurrencyKind) (rng.Next() % (int) CurrencyKind._Count),
         };
         
         if (rng.NextDouble() > 0.5f)

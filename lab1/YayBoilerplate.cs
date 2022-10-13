@@ -12,23 +12,27 @@ public interface IGet<T> where T : class
     T Value { get; }
 }
 
+
 // Hurray, I love boilerplate so much (I don't).
-public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataErrorInfo, ICarModel
+public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
-    private AbstractValidator<ICarModel> _validator;
+    private ICarDomain _domain;
     private CarModel _model;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public CarViewModel(AbstractValidator<ICarModel> validator)
+    public CarViewModel(ICarDomain domain)
     {
-        _validator = validator;
+        _domain = domain;
     }
 
-    public CarViewModel(AbstractValidator<ICarModel> validator, CarModel model)
+    public CarViewModel(ICarDomain domain, CarModel model)
     {
-        _validator = validator;
+        _domain = domain;
         _model = model;
     }
+
+    // Used to diplay comboboxes in the ui.
+    public ICarDomain Domain => _domain;
 
     public CarModel Model
     {
@@ -108,6 +112,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
             }
         }
     }
+
     public CurrencyKind Price_Kind
     {
         get => Model.Price.Kind;
@@ -119,9 +124,13 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
                 p.Kind = value;
                 Model.Price = p;
                 OnPropertyChanged("Price_Kind");
+
+                // see explanation below.
+                OnPropertyChanged("Price_KindIndex");
             }
         }
     }
+
     public int CountryId
     {
         get => Model.CountryId;
@@ -191,9 +200,13 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
             {
                 Model.EngineKind = value;
                 OnPropertyChanged("EngineKind");
+                
+                // see explanation below.
+                OnPropertyChanged("EngineKindIndex");
             }
         }
     }
+
     public float KilometersTravelled
     {
         get => Model.KilometersTravelled;
@@ -252,7 +265,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
 
     public byte Color_Red
     {
-        get => (byte)Model.Color.Red;
+        get => (byte) Model.Color.Red;
         set
         {
             if (Color.Red != value)
@@ -265,7 +278,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
 
     public byte Color_Green
     {
-        get => (byte)Model.Color.Green;
+        get => (byte) Model.Color.Green;
         set
         {
             if (Color.Green != value)
@@ -278,7 +291,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
 
     public byte Color_Blue
     {
-        get => (byte)Model.Color.Blue;
+        get => (byte) Model.Color.Blue;
         set
         {
             if (Color.Blue != value)
@@ -291,7 +304,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
 
     public byte Color_Alpha
     {
-        get => (byte)Model.Color.Alpha;
+        get => (byte) Model.Color.Alpha;
         set
         {
             if (Color.Alpha != value)
@@ -303,7 +316,7 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
     }
 
     private ValidationResult _cachedValidationResult;
-    private ValidationResult ValidationResult => _cachedValidationResult ??= _validator.Validate(this);
+    private ValidationResult ValidationResult => _cachedValidationResult ??= _domain.Validator.Validate(this);
 
     string IDataErrorInfo.Error
     {
@@ -324,6 +337,20 @@ public class CarViewModel : System.ComponentModel.INotifyPropertyChanged, IDataE
             return string.Join(Environment.NewLine, errors);
         }
     }
+
+    
+    // I'm offering help with assigning the enum as an int rather than as enum.
+    // This is to be able to set custom display strings for the enum fields,
+    // plus it's faster in case of two-way bindings.
+    public int Price_KindIndex
+    {
+        get => (int) Model.Price.Kind;
+        set => Price_Kind = (CurrencyKind) value;
+    }
+    
+    public int EngineKindIndex
+    {
+        get => (int) Model.EngineKind;
+        set => EngineKind = (EngineKind) value;
+    }
 }
-
-
