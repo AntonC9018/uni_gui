@@ -1,6 +1,8 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace CarApp;
 
@@ -58,5 +60,28 @@ public static partial class Properties
     public static void SetFocus(DependencyObject d, bool value)
     {
         d.SetValue(FocusProperty, value);
+    }
+}
+
+[MarkupExtensionReturnType(typeof(Binding))]
+public class ReactiveBinding : MarkupExtension
+{
+    public string Path { get; set; }
+    public string StringFormat { get; set; }
+
+    public ReactiveBinding(string path)
+    {
+        Path = path;
+    }
+
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        return new Binding(Path)
+        {
+            Mode = BindingMode.TwoWay,
+            ValidatesOnDataErrors = true,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            StringFormat = StringFormat,
+        };
     }
 }

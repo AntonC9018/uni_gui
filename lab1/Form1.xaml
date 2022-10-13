@@ -50,12 +50,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <DatePicker
-                                SelectedDate="{
-                                    Binding ManufacturedDate,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                SelectedDate="{local:ReactiveBinding ManufacturedDate}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -67,12 +62,7 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{
-                                    Binding NumberplateText,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                Text="{local:ReactiveBinding NumberplateText}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -85,12 +75,7 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Manufacturers}"
-                                SelectedIndex="{
-                                    Binding ManufacturerId,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                SelectedIndex="{local:ReactiveBinding ManufacturerId}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -103,12 +88,7 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Countries}"
-                                SelectedIndex="{
-                                    Binding CountryId,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                SelectedIndex="{local:ReactiveBinding CountryId}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -121,12 +101,7 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.EngineKinds}"
-                                SelectedIndex="{
-                                    Binding EngineKindIndex,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                SelectedIndex="{local:ReactiveBinding EngineKindIndex}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -140,10 +115,8 @@
                                 <toolkit:DoubleUpDown
                                     local:Properties.Focus="True"
                                     Value="{
-                                        Binding KilometersTravelled,
-                                        StringFormat='#.00',
-                                        Mode=TwoWay,
-                                        UpdateSourceTrigger=PropertyChanged
+                                        local:ReactiveBinding Price_Value,
+                                        StringFormat='#.00'
                                     }"
                                     Increment="10"
                                     Minimum="0.01"
@@ -151,12 +124,7 @@
                                     />
                                 <ComboBox
                                     ItemsSource="{Binding Path=Domain.CurrencyKinds}"
-                                    SelectedIndex="{
-                                        Binding Price_KindIndex,
-                                        Mode=TwoWay,
-                                        ValidatesOnDataErrors=True,
-                                        UpdateSourceTrigger=PropertyChanged
-                                    }"
+                                    SelectedIndex="{local:ReactiveBinding Price_KindIndex}"
                                     Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                     />
                             </StackPanel>
@@ -171,12 +139,7 @@
                                 local:Properties.Focus="True"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                IsChecked="{
-                                    Binding HasOwner,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                IsChecked="{local:ReactiveBinding HasOwner}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -188,12 +151,7 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{
-                                    Binding Owner_FirstName,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                Text="{local:ReactiveBinding Owner_FirstName}"
                                 IsEnabled="{Binding HasOwner}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
@@ -206,12 +164,7 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{
-                                    Binding Owner_LastName,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                Text="{local:ReactiveBinding Owner_LastName}"
                                 IsEnabled="{Binding HasOwner}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
@@ -224,12 +177,7 @@
                         <DataTemplate>
                             <toolkit:ColorPicker
                                 local:Properties.Focus="True"
-                                SelectedColor="{
-                                    Binding Windows_Media_Color,
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
-                                }"
+                                SelectedColor="{local:ReactiveBinding Windows_Media_Color}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -242,11 +190,8 @@
                             <toolkit:IntegerUpDown
                                 local:Properties.Focus="True"
                                 Value="{
-                                    Binding KilometersTravelled,
-                                    StringFormat='#',
-                                    Mode=TwoWay,
-                                    ValidatesOnDataErrors=True,
-                                    UpdateSourceTrigger=PropertyChanged
+                                    local:ReactiveBinding KilometersTravelled,
+                                    StringFormat='#'
                                 }"
                                 Increment="100"
                                 Minimum="0"
