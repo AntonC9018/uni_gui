@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +21,19 @@ public static partial class Properties
     {
         target.SetValue(TemplateNameProperty, value);
     }
+}
+
+
+public class EnumViewModel<T>
+{
+    public EnumViewModel(string displayString, T value)
+    {
+        DisplayString = displayString;
+        Value = value;
+    }
+
+    public string DisplayString { get; }
+    public T Value { get; }
 }
 
 public class MyDataTemplateSelector : DataTemplateSelector
@@ -83,5 +98,29 @@ public class ReactiveBinding : MarkupExtension
             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
             StringFormat = StringFormat,
         };
+    }
+}
+
+// I want to have _Count field in my enums, which is why these functions exist at all.
+public static class EnumHelper
+{
+    public static string[] GetPublicEnumNames(this System.Type enumType)
+    {
+        return enumType.GetEnumNames().Where(n => !n.StartsWith("_")).ToArray();
+    }
+
+    public static IEnumerable<(T Value, string Name)> GetPublicEnumNameValues<T>()
+    {
+        return typeof(T)
+            .GetEnumValues()
+            .Cast<T>()
+            .Distinct()
+            .Select(value => (Value: value, Name: typeof(T).GetEnumName(value)))
+            .Where(t => !t.Name.StartsWith("_"));
+    }
+
+    public static IEnumerable<T> GetPublicEnumValues<T>()
+    {
+        return GetPublicEnumNameValues<T>().Select(t => t.Value);
     }
 }

@@ -11,22 +11,22 @@ Să se elaboreze o aplicație de tip DB pentru clasa respectivă, care va asigur
 
 
 La elaborarea interfeței să se folosească toate următoarele controle:
-- Label;
-- Button;
-- TextBox;
-- CheckBox;
+- Label; <!-- + -->
+- Button; <!-- + -->
+- TextBox; <!-- + -->
+- CheckBox; <!-- + -->
 - RadioButton;
-- GroupBox;
-- Panel;
-- ToolTip;
-- ListBox;
-- ComboBox;
-- NumericUpDown;
-- TrackBar;
-- ListView;
-- Horizontal and Verical ScrollBar;
-- Timer;
-- Splitter.
+- GroupBox; <!-- - -->
+- Panel; <!-- + -->
+- ToolTip; <!-- + -->
+- ListBox; <!-- - -->
+- ComboBox; <!-- + -->
+- NumericUpDown; <!-- + -->
+- TrackBar; <!-- -  -->
+- ListView; <!-- (am folosit DataGrid) -->
+- Horizontal and Verical ScrollBar; <!-- + (appear automatically when the window is not large enough) -->
+- Timer; <!-- + (for debugging) -->
+- Splitter. <!-- + (DataGrid uses these implicitly) -->
 
 Suplimentar, pot fi folosite următoarele:
 - LinkLabel;

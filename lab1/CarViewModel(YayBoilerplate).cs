@@ -8,12 +8,6 @@ using FluentValidation.Results;
 
 namespace CarApp.Model;
 
-public interface IGet<T> where T : class
-{
-    T Value { get; }
-}
-
-
 // Hurray, I love boilerplate so much (I don't).
 public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
@@ -349,7 +343,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
 
     private ValidationResult _cachedValidationResult;
     
-    // Prevent property evaluation from the debugger
+    // Prevent property evaluation by the debugger
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private ValidationResult ValidationResult => _cachedValidationResult ??= _domain.Validator.Validate(this);
 

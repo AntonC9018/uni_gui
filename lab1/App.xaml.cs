@@ -59,7 +59,7 @@ namespace CarApp
             var validator = new CarValidator(carRegistry);
             var domain = new CarDomain(validator, carRegistry);
             var db = new CarDatabase(new(cars), domain);
-            var form = new Form1(db);
+            var form = new CarDataGrid(db);
             form.Show();
         }
     }

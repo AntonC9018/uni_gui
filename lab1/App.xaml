@@ -4,6 +4,24 @@
              xmlns:local="clr-namespace:CarApp"
              Startup="Main">
     <Application.Resources>
-         
+        <!-- Check this out: https://learn.microsoft.com/en-us/dotnet/api/system.windows.controls.validation.validationadornersitefor?view=windowsdesktop-6.0 -->
+        <ControlTemplate x:Key="validationTemplate">
+            <DockPanel LastChildFill="True">
+                <TextBlock DockPanel.Dock="Right" 
+                    Foreground="Red"
+                    FontSize="14pt" 
+                    Margin="-15,0,0,0"
+                    FontWeight="Bold"
+                    Text="!"
+                    ToolTip="{Binding [0].ErrorContent}"/>
+                <Border BorderBrush="Red" BorderThickness="1">
+                    <AdornedElementPlaceholder x:Name="controlWithError" />
+                </Border>
+            </DockPanel>
+        </ControlTemplate>
+        
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="IsTabStop" Value="False"/>
+        </Style>
     </Application.Resources>
 </Application>

@@ -1,79 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace CarApp;
-
-public class CollectionProxy<Model, Observable> : ICollection<Model>
-{
-    private List<Model> _underlyingCollection;
-    private ObservableCollection<Observable> _underlyingObservable;
-    private Func<Model, Observable> _factory;
-
-    public CollectionProxy(List<Model> cars, ObservableCollection<Observable> bindings, Func<Model, Observable> factory)
-    {
-        _underlyingCollection = cars;
-        _underlyingObservable = bindings;
-        _factory = factory;
-
-        bindings.CollectionChanged += (sender, e) =>
-        {
-            Debug.Assert(sender is not null);
-            var collection = (ObservableCollection<Observable>) sender;
-
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Move:
-                {
-                    var t = _underlyingCollection[e.OldStartingIndex];
-                    _underlyingCollection[e.OldStartingIndex] = _underlyingCollection[e.NewStartingIndex];
-                    _underlyingCollection[e.NewStartingIndex] = t;
-                    break;
-                }
-                case NotifyCollectionChangedAction.Remove:
-                {
-                    _underlyingCollection.RemoveAt(e.OldStartingIndex);
-                    break;
-                }
-                default:
-                {
-                    Debug.Fail("Unsupported case " + e.Action);
-                    break;
-                }
-            }
-        };
-    }
-
-    public int Count => _underlyingCollection.Count;
-    public bool IsReadOnly => false;
-
-    public void Add(Model item)
-    {
-        _underlyingCollection.Add(item);
-        _underlyingObservable.Add(_factory(item));
-    }
-
-    public void Clear() => _underlyingCollection.Clear();
-    public bool Contains(Model item) => _underlyingCollection.Contains(item);
-    public void CopyTo(Model[] array, int arrayIndex) => _underlyingCollection.CopyTo(array, arrayIndex);
-    public IEnumerator<Model> GetEnumerator() => _underlyingCollection.GetEnumerator();
-    public bool Remove(Model item)
-    {
-        var index = _underlyingCollection.IndexOf(item);
-        if (index == -1)
-            return false;
-        _underlyingObservable.RemoveAt(index);
-        return true;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
-
 
 // https://stackoverflow.com/a/2177659/9731532
 /* 
