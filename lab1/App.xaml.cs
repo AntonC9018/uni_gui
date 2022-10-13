@@ -31,7 +31,7 @@ public partial class App : Application
         {
             MessageBox.Show(
                 "An unhandled exception just occurred: " + e.Exception.Message,
-                "Exception Sample",
+                e.Exception.GetType().FullName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             e.Handled = true;
@@ -39,9 +39,13 @@ public partial class App : Application
 
         var basePath = (e.Args.Length > 1) ? e.Args[1] : Directory.GetCurrentDirectory();
         var dataPath = Path.Join(basePath, "data");
-        var assets = DataHelper.CreateAssetContext(dataPath);
-        if (assets is null)
+        var assets = new AssetLoaderService();
+        assets.DataPath = dataPath;
+        if (!Directory.Exists(dataPath))
+        {
+            Console.WriteLine("No data folder found. Make sure you're running the program in the right directory.");
             return;
+        }
 
         var carRegistry = new CarDependenciesRegistry();
         if (!carRegistry.Initialize(assets))
@@ -71,7 +75,7 @@ public partial class App : Application
         var validator = new CarValidator(carRegistry);
         var domain = new CarDomain(validator, carRegistry);
         var db = new CarDatabase(new(cars), domain);
-        var form = new CarDataGrid(db);
+        var form = new LoadStuffMenu(db, assets);
         form.Show();
     }
 }

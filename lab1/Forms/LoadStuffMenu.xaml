@@ -1,0 +1,31 @@
+﻿<Window x:Class="CarApp.LoadStuffMenu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CarApp"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="LoadStuffMenu">
+    <StackPanel Orientation="Vertical">
+        <GroupBox Header="Data folder">
+            <StackPanel Orientation="Vertical">
+                <Button
+                    Content="Open"
+                    Click="ShowOpenDataFolderInExplorerDialog"
+                    IsEnabled="{}"
+                    />
+                <Button Content="Select" Click="ShowSelectDataFolderDialog" />
+                <!-- <Button Content="Prepare For Use" Click="PrepareDataFolderForUse" /> -->
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Car database actions">
+            <StackPanel Orientation="Vertical">
+                <Button Content="Open" Click="ShowOpenCarDatabaseDialog" />
+                <Button Content="Save" Click="SaveCarDatabase_MaybeShowSaveAsDialog" />
+                <Button Content="New" Click="ShowCreateNewCarDatabaseDialog" />
+                <Button Content="Save As" Click="ShowSaveAsDialog" />
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</Window>

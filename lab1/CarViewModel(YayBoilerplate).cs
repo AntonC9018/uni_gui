@@ -9,7 +9,7 @@ using FluentValidation.Results;
 namespace CarApp.Model;
 
 // Hurray, I love boilerplate so much (I don't).
-public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
+public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
     private ICarDomain _domain;
     private CarModel _model;

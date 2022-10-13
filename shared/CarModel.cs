@@ -264,7 +264,7 @@ public class CarDependenciesRegistry
     private const string _CountriesFileName = "countries.txt";
     public string[] Countries { get; private set; }
 
-    public bool Initialize(AssetContext assets)
+    public bool Initialize(IAssetContext assets)
     {
         Manufacturers = assets.ReadFileStrings(_ManufacturersFileName);
         if (Manufacturers is null)
