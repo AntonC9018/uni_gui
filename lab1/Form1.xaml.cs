@@ -74,15 +74,12 @@ public partial class Form1 : Window
         InitializeComponent();
         // InitializeComponent2();
 
-        var dispatcherTimer = new DispatcherTimer();
-        dispatcherTimer.Tick += (_, _) =>
+        Trigger.Click += (_, _) =>
         {
             database.CarBindings[0].Price_Value += 10;
             database.CarBindings[0].Owner_FirstName = "anton";
             database.CarBindings[0].Owner_LastName += "a";
         };
-        dispatcherTimer.Interval = TimeSpan.FromMilliseconds(3000);
-        dispatcherTimer.Start();
     }
 
 #if !VISUAL_STUDIO_DESIGNER && false

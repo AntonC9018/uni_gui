@@ -53,7 +53,7 @@
     "HasOwner": true,
     "Owner": {
       "FirstName": "John",
-      "LastName": "Smith"
+      "LastName": "invalidName"
     },
     "EngineKind": "Bio",
     "KilometersTravelled": 83472.0,

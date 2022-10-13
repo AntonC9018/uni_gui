@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
@@ -152,6 +153,12 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
             {
                 Model.HasOwner = value;
                 OnPropertyChanged(nameof(HasOwner));
+
+                // Property interdependencies are not handled automatically.
+                // This hack forces the system to update validation ui of the dependent props.
+                OnPropertyChanged(nameof(Owner));
+                OnPropertyChanged(nameof(Owner_FirstName));
+                OnPropertyChanged(nameof(Owner_LastName));
             }
         }
     }
@@ -272,8 +279,7 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
         }
         set
         {
-            var c = Windows_Media_Color;
-            Color = new RGBAColor(c.R, c.G, c.B, c.A);
+            Color = new RGBAColor(value.R, value.G, value.B, value.A);
         }
     }
 
@@ -342,6 +348,9 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
     }
 
     private ValidationResult _cachedValidationResult;
+    
+    // Prevent property evaluation from the debugger
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private ValidationResult ValidationResult => _cachedValidationResult ??= _domain.Validator.Validate(this);
 
     string IDataErrorInfo.Error
@@ -389,13 +398,14 @@ public class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
                     },
                     nameof(Price_KindIndex) => new[] { nameof(Price_Kind) },
                     nameof(EngineKindIndex) => new[] { nameof(EngineKind) },
+                    nameof(Windows_Media_Color) => GetActualColumnName(nameof(Color)),
                     _ => new[] { columnName },
                 };
             }
 
             string[] actualColumnNames = GetActualColumnName(columnName);
             var errors = ValidationResult.Errors.Where(p => Array.IndexOf(actualColumnNames, p.PropertyName) != -1);
-            return string.Join(Environment.NewLine, errors);
+            return string.Join(Environment.NewLine, errors.Select(e => e.ErrorMessage));
         }
     }
 

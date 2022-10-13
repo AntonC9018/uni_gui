@@ -51,10 +51,10 @@ public record struct RGBAColor
 
     public RGBAColor(int r, int g, int b, int a = 0xFF)
     {
-        Debug.Assert(r > 0 && r <= 0xFF);
-        Debug.Assert(g > 0 && g <= 0xFF);
-        Debug.Assert(b > 0 && b <= 0xFF);
-        Debug.Assert(a > 0 && a <= 0xFF);
+        Debug.Assert(r >= 0 && r <= 0xFF);
+        Debug.Assert(g >= 0 && g <= 0xFF);
+        Debug.Assert(b >= 0 && b <= 0xFF);
+        Debug.Assert(a >= 0 && a <= 0xFF);
         HexValue = unchecked(
             ((uint) r << 0)
             | ((uint) g << 8)
@@ -67,7 +67,7 @@ public record struct RGBAColor
         readonly get => unchecked((int) ((HexValue >> 0) & 0xFF));
         set
         {
-            Debug.Assert(value > 0 && value <= 0xFF);
+            Debug.Assert(value >= 0 && value <= 0xFF);
             HexValue = unchecked((uint) (HexValue & ~(0xFF << 0)) | ((uint) value << 0));
         }
     }
@@ -76,7 +76,7 @@ public record struct RGBAColor
         readonly get => unchecked((int) ((HexValue >> 8) & 0xFF));
         set
         {
-            Debug.Assert(value > 0 && value <= 0xFF);
+            Debug.Assert(value >= 0 && value <= 0xFF);
             HexValue = unchecked((uint) (HexValue & ~(0xFF << 8)) | ((uint) value << 8));
         }
     }
@@ -85,7 +85,7 @@ public record struct RGBAColor
         readonly get => unchecked((int) ((HexValue >> 16) & 0xFF));
         set
         {
-            Debug.Assert(value > 0 && value <= 0xFF);
+            Debug.Assert(value >= 0 && value <= 0xFF);
             HexValue = unchecked((uint) (HexValue & ~(0xFF << 16)) | ((uint) value << 16));
         }
     }
@@ -94,7 +94,7 @@ public record struct RGBAColor
         readonly get => unchecked((int) ((HexValue >> 24) & 0xFF));
         set
         {
-            Debug.Assert(value > 0 && value <= 0xFF);
+            Debug.Assert(value >= 0 && value <= 0xFF);
             HexValue = unchecked((uint) (HexValue & ~(0xFF << 24)) | ((uint) value << 24));
         }
     }

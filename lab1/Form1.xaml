@@ -31,18 +31,31 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Button Name="Trigger" Content="Trigger" Grid.Row="1" Grid.Column="0" />
+        
         <DataGrid Name="CarDataGrid"
-                  ItemsSource="{Binding Path=CarBindings}"
+                  ItemsSource="{Binding CarBindings}"
                   Grid.Row="0" Grid.Column="0"
                   AutoGenerateColumns="false"
-                  HorizontalAlignment="Stretch"
                   >
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Manufactured On">
+                <DataGridTemplateColumn
+                    Header="Manufactured On"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <DatePicker
-                                SelectedDate="{Binding ManufacturedDate, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                SelectedDate="{
+                                    Binding ManufacturedDate,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
@@ -54,7 +67,13 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{Binding NumberplateText, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Text="{
+                                    Binding NumberplateText,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -66,7 +85,13 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Manufacturers}"
-                                SelectedIndex="{Binding ManufacturerId, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                SelectedIndex="{
+                                    Binding ManufacturerId,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -78,7 +103,13 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.Countries}"
-                                SelectedIndex="{Binding CountryId, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                SelectedIndex="{
+                                    Binding CountryId,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -90,7 +121,13 @@
                             <ComboBox
                                 local:Properties.Focus="True"
                                 ItemsSource="{Binding Path=Domain.EngineKinds}"
-                                SelectedIndex="{Binding Path=EngineKindIndex, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                SelectedIndex="{
+                                    Binding EngineKindIndex,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -102,13 +139,25 @@
                             <StackPanel Orientation="Horizontal">
                                 <toolkit:DoubleUpDown
                                     local:Properties.Focus="True"
-                                    Value="{Binding KilometersTravelled, StringFormat='#.00', Mode=TwoWay}"
+                                    Value="{
+                                        Binding KilometersTravelled,
+                                        StringFormat='#.00',
+                                        Mode=TwoWay,
+                                        UpdateSourceTrigger=PropertyChanged
+                                    }"
                                     Increment="10"
                                     Minimum="0.01"
+                                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                     />
                                 <ComboBox
                                     ItemsSource="{Binding Path=Domain.CurrencyKinds}"
-                                    SelectedIndex="{Binding Price_KindIndex, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                    SelectedIndex="{
+                                        Binding Price_KindIndex,
+                                        Mode=TwoWay,
+                                        ValidatesOnDataErrors=True,
+                                        UpdateSourceTrigger=PropertyChanged
+                                    }"
+                                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                     />
                             </StackPanel>
                         </DataTemplate>
@@ -122,7 +171,13 @@
                                 local:Properties.Focus="True"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                IsChecked="{Binding HasOwner, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                IsChecked="{
+                                    Binding HasOwner,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -133,7 +188,12 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{Binding Owner_FirstName, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Text="{
+                                    Binding Owner_FirstName,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
                                 IsEnabled="{Binding HasOwner}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
@@ -146,7 +206,12 @@
                         <DataTemplate>
                             <TextBox
                                 local:Properties.Focus="True"
-                                Text="{Binding Owner_LastName, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Text="{
+                                    Binding Owner_LastName,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
                                 IsEnabled="{Binding HasOwner}"
                                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
@@ -159,7 +224,13 @@
                         <DataTemplate>
                             <toolkit:ColorPicker
                                 local:Properties.Focus="True"
-                                SelectedColor="{Binding Windows_Media_Color, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                SelectedColor="{
+                                    Binding Windows_Media_Color,
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -170,9 +241,16 @@
                         <DataTemplate>
                             <toolkit:IntegerUpDown
                                 local:Properties.Focus="True"
-                                Value="{Binding KilometersTravelled, StringFormat='#', Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                Value="{
+                                    Binding KilometersTravelled,
+                                    StringFormat='#',
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True,
+                                    UpdateSourceTrigger=PropertyChanged
+                                }"
                                 Increment="100"
                                 Minimum="0"
+                                Validation.ErrorTemplate="{StaticResource validationTemplate}"
                                 />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
