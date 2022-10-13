@@ -96,38 +96,21 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Owner">
+                <DataGridCheckBoxColumn Header="Has Owner"
+                    Binding="{Binding HasOwner, UpdateSourceTrigger=PropertyChanged}" />
+                    
+                <DataGridTemplateColumn Header="Owner First Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="2*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
+                                <TextBox Text="{Binding Owner_FirstName}" IsEnabled="{Binding HasOwner}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                                <Label Grid.Row="0" Grid.Column="0">HasOwner:</Label>
-                                <CheckBox
-                                    Grid.Row="1" Grid.Column="0"
-                                    IsChecked="{Binding HasOwner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    HorizontalAlignment="Center"/>
-                                
-                                <Label Grid.Row="0" Grid.Column="1">First Name:</Label>
-                                <TextBox
-                                    Grid.Row="1" Grid.Column="1"
-                                    Text="{Binding Owner_FirstName}"
-                                    IsEnabled="{Binding HasOwner}"/>
-
-                                <Label Grid.Row="0" Grid.Column="2">Last Name:</Label>
-                                <TextBox
-                                    Grid.Row="1" Grid.Column="2"
-                                    Text="{Binding Owner_LastName}"
-                                    IsEnabled="{Binding HasOwner}"/>
-                            </Grid>
+                <DataGridTemplateColumn Header="Owner Last Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                                <TextBox Text="{Binding Owner_LastName}" IsEnabled="{Binding HasOwner}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
