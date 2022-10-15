@@ -7,35 +7,65 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using CarApp.Assets;
+using CarApp.Model;
 using Newtonsoft.Json;
 using Ookii.Dialogs.Wpf;
 
 namespace CarApp;
 
+public interface IAssetLoaderService
+{
+    void InitializeDataPath(string dataPath);
+    bool CheckDataPathInitialized(string dataPath);
+    void SaveCars(IEnumerable<CarModel> cars, string path);
+    IEnumerable<CarModel> LoadCars(string path);
+}
+
 // Right now it's kinda two things,
 // both loader of things and also context of the domain,
 // but not the context of the currently open car database.
-public class AssetLoaderContext
+public class AssetLoader : IAssetLoaderService
 {
+    private JsonSerializer CarSerializer { get; }
+    private Assembly ResourceAssembly { get; }
+    private IReadOnlyList<string> RequiredResourceNames { get; }
 
-    // It's fine, can be shared.
-    public JsonSerializer CarSerializer { get; }
-    public Assembly ResourceAssembly { get; }
-    public IReadOnlyList<string> RequiredResourceNames { get; }
-
-    public AssetLoaderContext(JsonSerializer carSerializer, Assembly resourceAssembly, string[] requiredResourceNames)
+    public AssetLoader(JsonSerializer carSerializer, Assembly resourceAssembly, string[] requiredResourceNames)
     {
         CarSerializer = carSerializer;
         ResourceAssembly = resourceAssembly;
         RequiredResourceNames = requiredResourceNames;
     }
+
+    public void InitializeDataPath(string dataPath)
+    {
+        // Should be factored out into a method on the asset loader (or even better on the view model).
+        var paths = AssetHelper.GetRequiredDataPaths(RequiredResourceNames, dataPath);
+        AssetHelper.InitializeDataPath(ResourceAssembly, paths);
+    }
+
+    public bool CheckDataPathInitialized(string dataPath)
+    {
+        return AssetHelper.IsDataPathInitialized(ResourceAssembly, RequiredResourceNames, dataPath);
+    }
+
+    public void SaveCars(IEnumerable<CarModel> cars, string path)
+    {
+        DataHelper.WriteJson(path, CarSerializer, cars);
+    }
+
+    public IEnumerable<CarModel> LoadCars(string path)
+    {
+        return DataHelper.ReadJson<List<CarModel>>(path, CarSerializer);
+    }
 }
 
-public class CarAssetHandlerState : IAssetContext
+public class CarAssetModel : IAssetContext
 {
     public string DataPath { get; set; }
     public bool IsDataDirectoryInitialized { get; set; }
     public string CarDataPath;
+    public bool IsDirty { get; set; }
 }
 
 public static class AssetHelper
@@ -80,72 +110,50 @@ public static class AssetHelper
     }
 }
 
-public sealed class AssetLoaderViewModel : INotifyPropertyChanged
-{
-    private AssetLoaderContext _assets;
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public AssetLoaderViewModel(AssetLoaderContext assets)
-    {
-        _assets = assets;
-    }
-
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public string DataPath
-    {
-        get => _assets.DataPath;
-        set
-        {
-
-        }
-    }
-
-    public bool CanLoad
-    {
-        get => _assets.IsDataDirectoryInitialized;
-    }
-}
 
 public partial class LoadStuffMenu : Window
 {
-    private AssetLoaderContext _assetLoader;
-    private AssetLoaderViewModel _assetsViewModel;
-    private CarAssetHandlerState _carAssetState;
+    private IAssetLoaderService _assetLoader;
+    private CarAssetModel _assetModel;
+    private CarDatabase _database;
 
-
-    public LoadStuffMenu(CarDatabase database, AssetLoaderContext assetLoader)
+    public LoadStuffMenu(CarDatabase database, IAssetLoaderService assetLoader)
     {
-        DataContext = database;
+        _database = database;
         _assetLoader = assetLoader;
-        _assetsViewModel = new(_assetLoader);
-        _carAssetState = new();
+        _assetModel = new();
+        
+        _database.CarBindings.CollectionChanged += (sender, e) =>
+        {
+            foreach (var it in e.NewItems)
+            {
+                ((CarViewModel) it).PropertyChanged += (_, _) =>
+                {
+                    // This should be under a property, with update events.
+                    _assetModel.IsDirty = true;
+                };
+            }
+        };
 
         InitializeComponent();
     }
 
     internal void PrepareDataFolderForUse(object sender, EventArgs e)
     {
-        if (_assetLoader.IsDataDirectoryInitialized
-            || _assetLoader.DataPath is null)
+        if (_assetModel.IsDataDirectoryInitialized
+            || _assetModel.DataPath is null)
         {
             return;
         }
 
-        // Should be factored out into a method on the asset loader (or even better on the view model).
-        var paths = AssetHelper.GetRequiredDataPaths(_assetLoader.RequiredResourceNames, _assetLoader.DataPath);
-        AssetHelper.InitializeDataPath(_assetLoader.ResourceAssembly, paths);
-        // TODO: set the bool.
-        _assetLoader.IsDataDirectoryInitialized = true;
+        _assetLoader.InitializeDataPath(_assetModel.DataPath);
+        _assetModel.IsDataDirectoryInitialized = true;
     }
 
     internal void ShowOpenDataFolderInExplorerDialog(object sender, EventArgs e)
     {
-        if (_assetLoader.DataPath is not null)
-            Process.Start(_assetLoader.DataPath);
+        if (_assetModel.DataPath is not null)
+            Process.Start(_assetModel.DataPath);
     }
 
     internal void ShowSelectDataFolderDialog(object sender, EventArgs e)
@@ -160,22 +168,21 @@ public partial class LoadStuffMenu : Window
         
         // Same thing, should probably be moved.
         string selectedPath = dialog.SelectedPath;
-        _assetLoader.DataPath = selectedPath;
-        _assetLoader.IsDataDirectoryInitialized = AssetHelper.IsDataPathInitialized(
-            _assetLoader.ResourceAssembly, _assetLoader.RequiredResourceNames, selectedPath);
+        _assetModel.DataPath = selectedPath;
+        _assetModel.IsDataDirectoryInitialized = _assetLoader.CheckDataPathInitialized(selectedPath);
     }
 
     private string GetDefaultSavePath()
     {
-        if (_carAssetState.CarDataPath is not null)
+        if (_assetModel.CarDataPath is not null)
         {
-            var filePath = _carAssetState.CarDataPath;
+            var filePath = _assetModel.CarDataPath;
             var folderPath = Path.GetDirectoryName(filePath);
             return folderPath;
         }
 
-        if (_assetLoader.DataPath is not null)
-            return _assetLoader.DataPath;
+        if (_assetModel.DataPath is not null)
+            return _assetModel.DataPath;
 
         Debug.Fail("The default data path should be initially set to somewhere in the appdata");
         return null;
@@ -195,18 +202,49 @@ public partial class LoadStuffMenu : Window
             return;
 
         string selectedFile = dialog.FileName;
-        // TODO: call the loading functton here.
+        try
+        {
+            var cars = _assetLoader.LoadCars(selectedFile);
+            _database.ResetCars(cars);
+            _assetModel.IsDirty = false;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not load file {selectedFile}: {ex.Message}.\r\n{ex.StackTrace}",
+                "Could not load file",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+    }
+
+    private void SaveCurrentCars()
+    {
+        try
+        {
+            _assetLoader.SaveCars(_database.Cars, _assetModel.CarDataPath);
+            _assetModel.IsDirty = false;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not save file {_assetModel.CarDataPath}: {ex.Message}.\r\n{ex.StackTrace}",
+                "Could not save file",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
     }
 
     internal void SaveCarDatabase_MaybeShowSaveAsDialog(object sender, EventArgs e)
     {
-        if (_carAssetState.CarDataPath is null)
+        if (_assetModel.CarDataPath is null)
         {
             ShowCreateNewCarDatabaseDialog(sender, e);
             return;
         }
-
-        // TODO: write to file.
+        SaveCurrentCars();
     }
 
     private VistaSaveFileDialog GetCarSaveFileDialog()
@@ -221,16 +259,7 @@ public partial class LoadStuffMenu : Window
 
     internal void ShowCreateNewCarDatabaseDialog(object sender, EventArgs e)
     {
-        var dialog = GetCarSaveFileDialog();
-        dialog.CheckFileExists = true;
-
-        if (!(dialog.ShowDialog(this) ?? false))
-            return;
-
-        var filePath = dialog.FileName;
-        _carAssetState.CarDataPath = filePath;
-
-        // TODO: save.
+        ShowSaveAsDialog(sender, e);
     }
     
     internal void ShowSaveAsDialog(object sender, EventArgs e)
@@ -238,13 +267,37 @@ public partial class LoadStuffMenu : Window
         var dialog = GetCarSaveFileDialog();
         dialog.CheckFileExists = false;
         
-        // TODO: refactor with the method above.
         if (!(dialog.ShowDialog(this) ?? false))
             return;
 
-        var filePath = dialog.FileName;
-        _carAssetState.CarDataPath = filePath;
+        _assetModel.CarDataPath = dialog.FileName;
+        SaveCurrentCars();
+    }
 
-        // TODO: save.
+    
+    private static readonly string[] _FirstNames = { "Steve", "John", "Maria", "Grace", };
+    private static readonly string[] _LastNames = { "Smith", "Miller", "Martin", "Bower", };
+
+    internal void GenerateRandomCars(Random rng, int numCarsToGenerate = 5)
+    {
+        var cars = new List<CarModel>();
+
+        for (int i = 0; i < numCarsToGenerate; i++)
+        {
+            var car = CarModelUtils.GenerateRandomModel(
+                rng,
+                _database.Domain.Manufacturers.Count,
+                _database.Domain.Countries.Count,
+                _FirstNames, _LastNames);
+            cars.Add(car);
+        }
+    }
+
+    private void OpenPreviousSession()
+    {
+        // TODO: save the previous path in the registry or the app config?
+        // const string carsFileName = "cars.json";
+        // if (!assets.TryReadJson(carsFileName, jsonSerializer, out List<CarModel> cars))
+        //     assets.WriteJson(carsFileName, jsonSerializer, cars);
     }
 }

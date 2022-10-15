@@ -11,23 +11,23 @@ namespace CarApp.Model;
 // Hurray, I love boilerplate so much (I don't).
 public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
 {
-    private ICarDomain _domain;
+    private ICarViewDomain _domain;
     private CarModel _model;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public CarViewModel(ICarDomain domain)
+    public CarViewModel(ICarViewDomain domain)
     {
         _domain = domain;
     }
 
-    public CarViewModel(ICarDomain domain, CarModel model)
+    public CarViewModel(ICarViewDomain domain, CarModel model)
     {
         _domain = domain;
         _model = model;
     }
 
     // Used to diplay comboboxes in the ui.
-    public ICarDomain Domain => _domain;
+    public ICarViewDomain Domain => _domain;
 
     public CarModel Model
     {

@@ -317,14 +317,15 @@ public static class CarModelUtils
 {
     public static CarModel GenerateRandomModel(
         Random rng,
-        CarDependenciesRegistry carRegistry,
+        int numManufacturers,
+        int numCountries,
         ReadOnlySpan<string> firstNames,
         ReadOnlySpan<string> lastNames)
     {
         var car = new CarModel();
         car.EngineKind = (EngineKind) (rng.Next() % (int) EngineKind._Count);
-        car.CountryId = rng.Next() % carRegistry.Countries.Length;
-        car.ManufacturerId = rng.Next() % carRegistry.Manufacturers.Length;
+        car.CountryId = rng.Next() % numCountries;
+        car.ManufacturerId = rng.Next() % numManufacturers;
 
         car.NumberplateText = ""
             + rng.NextRandomCapitalLetter()

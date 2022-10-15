@@ -22,31 +22,42 @@ public static class DataHelper
         return File.ReadAllLines(filePath);
     }
 
-    public static bool TryReadJson<T>(this IAssetContext assets, string path, JsonSerializer deserializer, out T result)
+    public static bool TryReadJson<T>(this IAssetContext assets, string relativePath, JsonSerializer deserializer, out T result)
     {
         result = default;
 
-        string filePath = Path.Join(assets.DataPath, path);
+        string filePath = Path.Join(assets.DataPath, relativePath);
         if (!File.Exists(filePath))
             return false;
 
         try
         {
-            using var fileStream = new StreamReader(filePath);
-            using var jsonReader = new JsonTextReader(fileStream);
-            result = deserializer.Deserialize<T>(jsonReader);
+            result = ReadJson<T>(filePath, deserializer);
             return true;
         }
         catch (JsonException e)
         {
-            Console.WriteLine($"Could not read {path} as {typeof(T).Name}: {e.ToString()}");
+            Console.WriteLine($"Could not read {relativePath} as {typeof(T).Name}: {e.ToString()}");
             return false;
         }
     }
 
-    public static void WriteJson<T>(this IAssetContext assets, string path, JsonSerializer serializer, T value)
+    public static T ReadJson<T>(string filePath, JsonSerializer deserializer)
     {
-        string filePath = Path.Join(assets.DataPath, path);
+        try
+        {
+            using var fileStream = new StreamReader(filePath);
+            using var jsonReader = new JsonTextReader(fileStream);
+            return deserializer.Deserialize<T>(jsonReader);
+        }
+        catch (JsonException)
+        {
+            throw;
+        }
+    }
+
+    public static void WriteJson<T>(string filePath, JsonSerializer serializer, T value)
+    {
         using var fileStream = new StreamWriter(filePath);
         using var jsonWriter = new JsonTextWriter(fileStream);
         serializer.Serialize(jsonWriter, value);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FluentValidation;
 
@@ -28,14 +29,20 @@ public interface ICarModel
     byte Color_Alpha { get; set; }
 }
 
+public interface ICarDomain
+{
+    IList<string> Manufacturers { get; }
+    IList<string> Countries { get; }
+}
+
 public class CarValidator : AbstractValidator<ICarModel>
 {
     private static readonly Regex _NameRegex = new Regex("^[A-Z][a-z]*$", RegexOptions.Compiled);
 
-    public CarValidator(CarDependenciesRegistry registry)
+    public CarValidator(ICarDomain registry)
     {
-        RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Length);
-        RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Length);
+        RuleFor(x => x.CountryId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Countries.Count);
+        RuleFor(x => x.ManufacturerId).GreaterThanOrEqualTo(0).LessThan(_ => registry.Manufacturers.Count);
         RuleFor(x => x.Color_Alpha).Equal((byte) 0xff);
         RuleFor(x => x.KilometersTravelled).GreaterThanOrEqualTo(0);
         RuleFor(x => x.Price_Value).GreaterThan(0);
