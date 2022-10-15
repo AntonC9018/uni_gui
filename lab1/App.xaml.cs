@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using CarApp.Model;
 using CarApp.Assets;
 using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Linq;
 
 namespace CarApp;
 
@@ -39,20 +41,27 @@ public partial class App : Application
 
         var basePath = (e.Args.Length > 1) ? e.Args[1] : Directory.GetCurrentDirectory();
         var dataPath = Path.Join(basePath, "data");
-        var assets = new AssetLoaderService();
-        assets.DataPath = dataPath;
+
         if (!Directory.Exists(dataPath))
         {
             Console.WriteLine("No data folder found. Make sure you're running the program in the right directory.");
             return;
         }
 
+        var resourceAssembly = Assembly.GetExecutingAssembly();
+        var requiredResourceNames = resourceAssembly.GetManifestResourceNames()
+            .Where(n => n.EndsWith(".txt"))
+            .ToArray();
+        var jsonSettings = CarModelUtils.GetSerializerSettings();
+        var jsonSerializer = JsonSerializer.Create(jsonSettings);
+
+        var assets = new AssetLoaderContext(jsonSerializer, resourceAssembly, requiredResourceNames);
+        assets.DataPath = dataPath;
+
         var carRegistry = new CarDependenciesRegistry();
         if (!carRegistry.Initialize(assets))
             return;
 
-        var jsonSettings = CarModelUtils.GetSerializerSettings();
-        var jsonSerializer = JsonSerializer.Create(jsonSettings);
         var rng = new Random(80850);
 
         const string carsFileName = "cars.json";
