@@ -60,7 +60,18 @@ public partial class App : Application
         var viewDomain = new CarViewDomain(validator, domain);
         var database = new CarDatabase(new(), viewDomain);
 
-        var form = new LoadStuffMenu(database, assetLoader);
+        var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var cachePath = Path.Join(appdataPath, ".carapp");
+        Directory.CreateDirectory(cachePath);
+
+        var carAssetModel = new CarAssetModel
+        {
+            CarDataPath = null,
+            DataPath = cachePath,
+            IsDataDirectoryInitialized = false,
+            IsDirty = false,
+        };
+        var form = new LoadStuffMenu(database, carAssetModel, assetLoader);
         form.Show();
     }
 }

@@ -10,21 +10,45 @@
     <StackPanel Orientation="Vertical">
         <GroupBox Header="Data folder">
             <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Currently selected data folder is "/> 
+                    <Label Content="{Binding DataPath}"/> 
+                </StackPanel>
                 <Button
                     Content="Open"
                     Click="ShowOpenDataFolderInExplorerDialog"
-                    IsEnabled="{}"
+                    IsEnabled="{Binding IsDataPathOpen}"
                     />
-                <Button Content="Select" Click="ShowSelectDataFolderDialog" />
+                <Button
+                    Content="Select"
+                    Click="ShowSelectDataFolderDialog"
+                    />
                 <!-- <Button Content="Prepare For Use" Click="PrepareDataFolderForUse" /> -->
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Car database actions">
             <StackPanel Orientation="Vertical">
-                <Button Content="Open" Click="ShowOpenCarDatabaseDialog" />
-                <Button Content="Save" Click="SaveCarDatabase_MaybeShowSaveAsDialog" />
-                <Button Content="New" Click="ShowCreateNewCarDatabaseDialog" />
-                <Button Content="Save As" Click="ShowSaveAsDialog" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Currently selected car database is "/> 
+                    <Label Content="{Binding CarDataPath}"/> 
+                </StackPanel>
+                <Button
+                    Content="Open"
+                    Click="ShowOpenCarDatabaseDialog"
+                    />
+                <Button
+                    Content="Save"
+                    Click="SaveCarDatabase_MaybeShowSaveAsDialog"
+                    IsEnabled="{Binding IsDirty}"
+                    />
+                <Button
+                    Content="New"
+                    Click="ShowCreateNewCarDatabaseDialog"
+                    />
+                <Button
+                    Content="Save As"
+                    Click="ShowSaveAsDialog"
+                    />
             </StackPanel>
         </GroupBox>
     </StackPanel>

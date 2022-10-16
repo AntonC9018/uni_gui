@@ -111,18 +111,99 @@ public static class AssetHelper
 }
 
 
+public class CarAssetViewModel : INotifyPropertyChanged
+{
+    private CarAssetModel _model;
+
+    public CarAssetViewModel(CarAssetModel model)
+    {
+        _model = model;
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public string DataPath
+    {
+        get => _model.DataPath;
+        set
+        {
+            if (DataPath != value)
+            {
+                bool openBefore = IsDataPathOpen;
+                _model.DataPath = value;
+                OnPropertyChanged(nameof(DataPath));
+                if (IsDataPathOpen != openBefore)
+                    OnPropertyChanged(nameof(IsDataPathOpen));
+            }
+        }
+    }
+    public bool IsDataPathOpen => DataPath is not null;
+    public bool IsDataDirectoryInitialized
+    {
+        get => _model.IsDataDirectoryInitialized;
+        set
+        {
+            if (IsDataDirectoryInitialized != value)
+            {
+                _model.IsDataDirectoryInitialized = value;
+                OnPropertyChanged(nameof(IsDataDirectoryInitialized));
+            }
+        }
+    }
+    public bool IsCarDatabaseOpen
+    {
+        get => CarDataPath is not null;
+    }
+    public string CarDataPath
+    {
+        get => _model.CarDataPath;
+        set
+        {
+            if (CarDataPath != value)
+            {
+                bool openBefore = IsCarDatabaseOpen;
+                _model.CarDataPath = value;
+                OnPropertyChanged(nameof(CarDataPath));
+
+                if (openBefore != IsCarDatabaseOpen)
+                   OnPropertyChanged(nameof(IsCarDatabaseOpen));
+            }
+        }
+    }
+    public bool IsDirty
+    {
+        get => _model.IsDirty;
+        set
+        {
+            if (IsDirty != value)
+            {
+                _model.IsDirty = value;
+                OnPropertyChanged(nameof(IsDirty));
+            }
+        }
+    }
+}
+
+
 public partial class LoadStuffMenu : Window
 {
     private IAssetLoaderService _assetLoader;
-    private CarAssetModel _assetModel;
+    private CarAssetViewModel _assetViewModel;
     private CarDatabase _database;
 
-    public LoadStuffMenu(CarDatabase database, IAssetLoaderService assetLoader)
+    public LoadStuffMenu(CarDatabase database, CarAssetModel carAssetModel, IAssetLoaderService assetLoader)
     {
         _database = database;
         _assetLoader = assetLoader;
-        _assetModel = new();
+        _assetViewModel = new(carAssetModel);
+        DataContext = _assetViewModel;
         
+
         _database.CarBindings.CollectionChanged += (sender, e) =>
         {
             foreach (var it in e.NewItems)
@@ -130,7 +211,7 @@ public partial class LoadStuffMenu : Window
                 ((CarViewModel) it).PropertyChanged += (_, _) =>
                 {
                     // This should be under a property, with update events.
-                    _assetModel.IsDirty = true;
+                    _assetViewModel.IsDirty = true;
                 };
             }
         };
@@ -140,20 +221,20 @@ public partial class LoadStuffMenu : Window
 
     internal void PrepareDataFolderForUse(object sender, EventArgs e)
     {
-        if (_assetModel.IsDataDirectoryInitialized
-            || _assetModel.DataPath is null)
+        if (_assetViewModel.IsDataDirectoryInitialized
+            || _assetViewModel.DataPath is null)
         {
             return;
         }
 
-        _assetLoader.InitializeDataPath(_assetModel.DataPath);
-        _assetModel.IsDataDirectoryInitialized = true;
+        _assetLoader.InitializeDataPath(_assetViewModel.DataPath);
+        _assetViewModel.IsDataDirectoryInitialized = true;
     }
 
     internal void ShowOpenDataFolderInExplorerDialog(object sender, EventArgs e)
     {
-        if (_assetModel.DataPath is not null)
-            Process.Start(_assetModel.DataPath);
+        if (_assetViewModel.DataPath is not null)
+            Process.Start("explorer.exe", _assetViewModel.DataPath);
     }
 
     internal void ShowSelectDataFolderDialog(object sender, EventArgs e)
@@ -168,21 +249,21 @@ public partial class LoadStuffMenu : Window
         
         // Same thing, should probably be moved.
         string selectedPath = dialog.SelectedPath;
-        _assetModel.DataPath = selectedPath;
-        _assetModel.IsDataDirectoryInitialized = _assetLoader.CheckDataPathInitialized(selectedPath);
+        _assetViewModel.DataPath = selectedPath;
+        _assetViewModel.IsDataDirectoryInitialized = _assetLoader.CheckDataPathInitialized(selectedPath);
     }
 
     private string GetDefaultSavePath()
     {
-        if (_assetModel.CarDataPath is not null)
+        if (_assetViewModel.CarDataPath is not null)
         {
-            var filePath = _assetModel.CarDataPath;
+            var filePath = _assetViewModel.CarDataPath;
             var folderPath = Path.GetDirectoryName(filePath);
             return folderPath;
         }
 
-        if (_assetModel.DataPath is not null)
-            return _assetModel.DataPath;
+        if (_assetViewModel.DataPath is not null)
+            return _assetViewModel.DataPath;
 
         Debug.Fail("The default data path should be initially set to somewhere in the appdata");
         return null;
@@ -206,7 +287,7 @@ public partial class LoadStuffMenu : Window
         {
             var cars = _assetLoader.LoadCars(selectedFile);
             _database.ResetCars(cars);
-            _assetModel.IsDirty = false;
+            _assetViewModel.IsDirty = false;
         }
         catch (Exception ex)
         {
@@ -223,13 +304,13 @@ public partial class LoadStuffMenu : Window
     {
         try
         {
-            _assetLoader.SaveCars(_database.Cars, _assetModel.CarDataPath);
-            _assetModel.IsDirty = false;
+            _assetLoader.SaveCars(_database.Cars, _assetViewModel.CarDataPath);
+            _assetViewModel.IsDirty = false;
         }
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"Could not save file {_assetModel.CarDataPath}: {ex.Message}.\r\n{ex.StackTrace}",
+                $"Could not save file {_assetViewModel.CarDataPath}: {ex.Message}.\r\n{ex.StackTrace}",
                 "Could not save file",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -239,7 +320,7 @@ public partial class LoadStuffMenu : Window
 
     internal void SaveCarDatabase_MaybeShowSaveAsDialog(object sender, EventArgs e)
     {
-        if (_assetModel.CarDataPath is null)
+        if (_assetViewModel.CarDataPath is null)
         {
             ShowCreateNewCarDatabaseDialog(sender, e);
             return;
@@ -270,7 +351,7 @@ public partial class LoadStuffMenu : Window
         if (!(dialog.ShowDialog(this) ?? false))
             return;
 
-        _assetModel.CarDataPath = dialog.FileName;
+        _assetViewModel.CarDataPath = dialog.FileName;
         SaveCurrentCars();
     }
 
