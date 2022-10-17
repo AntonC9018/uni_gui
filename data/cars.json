@@ -1,7 +1,7 @@
 [
   {
     "NumberplateText": "WJ08822",
-    "ManufacturedDate": "1850-01-24T09:17:08.0526178",
+    "ManufacturedDate": "1906-08-19T00:00:00",
     "ManufacturerId": 41,
     "Price": {
       "Value": 55797.0,
@@ -38,7 +38,7 @@
     "KilometersTravelled": 92672.0,
     "NumWheels": 4,
     "Color": {
-      "HexValue": "0xFFB6E26A"
+      "HexValue": "0xFF8F8FBC"
     }
   },
   {
@@ -53,7 +53,7 @@
     "HasOwner": true,
     "Owner": {
       "FirstName": "John",
-      "LastName": "invalidName"
+      "LastName": "Nume"
     },
     "EngineKind": "Bio",
     "KilometersTravelled": 83472.0,
@@ -81,27 +81,6 @@
     "NumWheels": 8,
     "Color": {
       "HexValue": "0xFF413802"
-    }
-  },
-  {
-    "NumberplateText": "IA05672",
-    "ManufacturedDate": "2010-10-28T15:30:06.8259775",
-    "ManufacturerId": 1,
-    "Price": {
-      "Value": 72981.0,
-      "Kind": "$"
-    },
-    "CountryId": 56,
-    "HasOwner": true,
-    "Owner": {
-      "FirstName": "Maria",
-      "LastName": "Miller"
-    },
-    "EngineKind": "Diesel",
-    "KilometersTravelled": 31238.0,
-    "NumWheels": 4,
-    "Color": {
-      "HexValue": "0xFF04BC88"
     }
   }
 ]

@@ -16,7 +16,7 @@ La elaborarea interfeței să se folosească toate următoarele controle:
 - TextBox; <!-- + -->
 - CheckBox; <!-- + -->
 - RadioButton;
-- GroupBox; <!-- - -->
+- GroupBox; <!-- + -->
 - Panel; <!-- + -->
 - ToolTip; <!-- + -->
 - ListBox; <!-- - -->

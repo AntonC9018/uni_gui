@@ -58,8 +58,8 @@ public class AssetLoader : IAssetLoaderService
             foreach (var country in File.ReadAllLines(p))
                 output.Add(country);
         }
-        Read(outDomain.Countries, RequiredResourceNames[0]);
-        Read(outDomain.Manufacturers, RequiredResourceNames[1]);
+        Read(outDomain.Countries, RequiredResourceNames.First(n => n.Contains("manufacturers")));
+        Read(outDomain.Manufacturers, RequiredResourceNames.First(n => n.Contains("countries")));
     }
 
     public void SaveCars(IEnumerable<CarModel> cars, string path)
@@ -94,7 +94,7 @@ public static class AssetHelper
 {
     public static bool IsDataPathInitialized(Assembly resourceAssembly, IEnumerable<string> requiredDataResourceNames, string dataPath)
     {
-        return GetRequiredDataPaths(requiredDataResourceNames, dataPath).Any(p => !File.Exists(p.FullPath));
+        return GetRequiredDataPaths(requiredDataResourceNames, dataPath).All(p => File.Exists(p.FullPath));
     }
 
     public record struct ResourcePath(string FullPath, string ResourceName);
@@ -230,7 +230,10 @@ public partial class LoadStuffMenu : Window
     private VistaSaveFileDialog _saveCarDatabaseDialog;
     private TaskDialog _whetherToSaveDirtiedFileDialog;
 
-    public LoadStuffMenu(CarDatabase database, CarAssetViewModel assetViewModel, IAssetLoaderService assetLoader)
+    public LoadStuffMenu(
+        CarDatabase database,
+        CarAssetViewModel assetViewModel,
+        IAssetLoaderService assetLoader)
     {
         _database = database;
         _assetLoader = assetLoader;
@@ -289,6 +292,9 @@ public partial class LoadStuffMenu : Window
         }
 
         InitializeComponent();
+
+        var dataGrid = new CarDataGrid(_database);
+        CarsGroupBox.Content = dataGrid;
     }
 
     internal void InitializeDataPath(object sender, EventArgs e)

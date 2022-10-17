@@ -30,8 +30,12 @@
                     />
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="Car database actions">
-            <StackPanel Orientation="Vertical">
+        <GroupBox
+            Header="Car database actions"
+            >
+            <StackPanel
+                Orientation="Vertical"
+                >
                 <StackPanel Orientation="Horizontal">
                     <Label Content="Currently selected car database is "/> 
                     <Label Content="{Binding CarDataPath}"/> 

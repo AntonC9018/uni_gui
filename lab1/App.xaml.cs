@@ -23,13 +23,24 @@ public class CarDatabase
         Domain = domain;
         CarBindings = new(cars, c => new CarViewModel(Domain, c));
     }
+}
 
-    public void ResetCars(IEnumerable<CarModel> newCars)
+
+public static class CarDatabaseOperations
+{
+    public static void ResetCars(this CarDatabase db, IEnumerable<CarModel> newCars)
     {
-        Cars.Clear();
+        db.Cars.Clear();
         foreach (var c in newCars)
-            Cars.Add(c);
-    } 
+            db.Cars.Add(c);
+    }
+
+    public static CarModel AddNewCar(this CarDatabase db)
+    {
+        var car = new CarModel();
+        db.Cars.Add(car);
+        return car;
+    }
 }
 
 public class SessionData
