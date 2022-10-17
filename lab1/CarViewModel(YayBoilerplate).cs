@@ -35,7 +35,7 @@ public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarM
         set
         {
             _model = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+            OnPropertyChanged(null);
         }
     }
 
@@ -86,11 +86,21 @@ public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarM
         get => Model.Price;
         set
         {
-            if (Price != value)
+            bool areDifferent = false;
+            if (Model.Price.Kind != value.Kind)
             {
-                Model.Price = value;
-                OnPropertyChanged(nameof(Price));
+                Model.Price.Kind = value.Kind;
+                areDifferent = true;
+                OnPropertyChanged(nameof(Price.Kind));
             }
+            if (Model.Price.Value != value.Value)
+            {
+                Model.Price.Value = value.Value;
+                areDifferent = true;
+                OnPropertyChanged(nameof(Price.Value));
+            }
+            if (areDifferent)
+                OnPropertyChanged(nameof(Price));
         }
     }
     public decimal Price_Value
@@ -103,6 +113,7 @@ public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarM
                 var p = Model.Price;
                 p.Value = value;
                 Model.Price = p;
+                OnPropertyChanged(nameof(Price));
                 OnPropertyChanged(nameof(Price_Value));
             }
         }
@@ -118,6 +129,7 @@ public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarM
                 var p = Model.Price;
                 p.Kind = value;
                 Model.Price = p;
+                OnPropertyChanged(nameof(Price));
                 OnPropertyChanged(nameof(Price_Kind));
 
                 // see explanation below.

@@ -32,8 +32,28 @@ public class CarDatabase
     } 
 }
 
+public class SessionData
+{
+    public string DataPath { get; set; }
+    public string CarDataPath { get; set; }
+}
+
+public class AppCache
+{
+    public SessionData LastSession { get; set; }
+}
+
 public partial class App : Application
 {
+    private AppCache _appCache;
+    private string _appCacheFilePath;
+
+    public void SerializeCache()
+    {
+        var str = JsonConvert.SerializeObject(_appCache);
+        File.WriteAllText(_appCacheFilePath, str);
+    }
+
     private void Main(object sender, StartupEventArgs e)
     {
         this.DispatcherUnhandledException += (_, e) =>
@@ -46,6 +66,11 @@ public partial class App : Application
             e.Handled = true;
         };
 
+        this.Exit += (_, _) =>
+        {
+            SerializeCache();
+        };
+
         var resourceAssembly = Assembly.GetExecutingAssembly();
         var requiredResourceNames = resourceAssembly.GetManifestResourceNames()
             .Where(n => n.EndsWith(".txt"))
@@ -54,24 +79,99 @@ public partial class App : Application
         var jsonSerializer = JsonSerializer.Create(jsonSettings);
         var assetLoader = new AssetLoader(jsonSerializer, resourceAssembly, requiredResourceNames);
 
-        var rng = new Random(80850);
-        var domain = new DynamicCarDomain(new(), new());
-        var validator = new CarValidator(domain);
-        var viewDomain = new CarViewDomain(validator, domain);
-        var database = new CarDatabase(new(), viewDomain);
 
         var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var cachePath = Path.Join(appdataPath, ".carapp");
         Directory.CreateDirectory(cachePath);
 
+        _appCacheFilePath = Path.Join(cachePath, "cache.json");
+        _appCache = LoadAppCache();
+        AppCache LoadAppCache()
+        {
+            if (!File.Exists(_appCacheFilePath))
+                return new AppCache();
+            
+            try
+            {
+                var appCacheText = File.ReadAllText(_appCacheFilePath);
+                return JsonConvert.DeserializeObject<AppCache>(appCacheText);
+            }
+            catch (JsonException exc)
+            {
+                Console.WriteLine(exc);
+                return new AppCache();
+            }
+        }
+        var session = _appCache.LastSession;
+        bool isDataDirectoryInitialized;
+        if (session is null)
+        {
+            if (!assetLoader.CheckDataPathInitialized(cachePath))
+                assetLoader.InitializeDataPath(cachePath);
+            isDataDirectoryInitialized = true;
+            _appCache.LastSession = session = new SessionData
+            {
+                DataPath = cachePath,
+                CarDataPath = null,
+            };
+        }
+        else
+        {
+            isDataDirectoryInitialized = assetLoader.CheckDataPathInitialized(session.DataPath);
+        }
+
+        var rng = new Random(80800);
+        var domain = new DynamicCarDomain(new(), new());
+        var validator = new CarValidator(domain);
+        var viewDomain = new CarViewDomain(validator, domain);
+        var database = new CarDatabase(new(), viewDomain);
+
         var carAssetModel = new CarAssetModel
         {
-            CarDataPath = null,
-            DataPath = cachePath,
-            IsDataDirectoryInitialized = false,
+            Session = session,
+            IsDataDirectoryInitialized = isDataDirectoryInitialized,
             IsDirty = false,
         };
-        var form = new LoadStuffMenu(database, carAssetModel, assetLoader);
+        var carAssetViewModel = new CarAssetViewModel(carAssetModel);
+
+        database.CarBindings.CollectionChanged += (sender, e) =>
+        {
+            if (e.NewItems is null)
+                return;
+            foreach (var it in e.NewItems)
+            {
+                ((CarViewModel) it).PropertyChanged += (_, _) =>
+                {
+                    carAssetViewModel.IsDirty = true;
+                };
+            }
+        };
+
+        if (isDataDirectoryInitialized)
+            assetLoader.ReadDomainData(domain, session.DataPath);
+
+        if (session.CarDataPath is not null)
+        {
+            if (File.Exists(session.CarDataPath))
+            {
+                try
+                {
+                    var cars = assetLoader.LoadCars(session.CarDataPath);
+                    database.ResetCars(cars);
+                }
+                catch (JsonException exc)
+                {
+                    session.CarDataPath = null;
+                    Console.WriteLine("Wrong format? " + exc);
+                }
+            }
+            else
+            {
+                session.CarDataPath = null;
+            }
+        }
+
+        var form = new LoadStuffMenu(database, carAssetViewModel, assetLoader);
         form.Show();
     }
 }

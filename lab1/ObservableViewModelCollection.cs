@@ -92,9 +92,12 @@ public class ObservableViewModelCollection<TViewModel, TModel> : ObservableColle
 
             case NotifyCollectionChangedAction.Reset:
             {
-                Clear();
-                for (int i = 0; i < e.NewItems.Count; i++)
-                    this.Add(_viewModelFactory((TModel) e.NewItems[i]));
+                this.Clear();
+                if (e.NewItems is not null)
+                {
+                    for (int i = 0; i < e.NewItems.Count; i++)
+                        this.Add(_viewModelFactory((TModel) e.NewItems[i]));
+                }
                 break;
             }
 

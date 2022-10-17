@@ -15,15 +15,19 @@
                     <Label Content="{Binding DataPath}"/> 
                 </StackPanel>
                 <Button
-                    Content="Open"
-                    Click="ShowOpenDataFolderInExplorerDialog"
+                    Content="Open In Explorer"
+                    Click="ShowDataFolderInExplorer"
                     IsEnabled="{Binding IsDataPathOpen}"
                     />
                 <Button
-                    Content="Select"
+                    Content="Open"
                     Click="ShowSelectDataFolderDialog"
                     />
-                <!-- <Button Content="Prepare For Use" Click="PrepareDataFolderForUse" /> -->
+                <Button
+                    Content="Initialize"
+                    Click="InitializeDataPath"
+                    IsEnabled="{Binding CanInitializeDataPath}"
+                    />
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Car database actions">
@@ -35,6 +39,11 @@
                 <Button
                     Content="Open"
                     Click="ShowOpenCarDatabaseDialog"
+                    />
+                <Button
+                    Content="Open In Explorer"
+                    Click="ShowCarDatabaseInExplorer"
+                    IsEnabled="{Binding IsCarDatabaseOpen}"
                     />
                 <Button
                     Content="Save"

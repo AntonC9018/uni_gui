@@ -203,6 +203,7 @@ public sealed class CurrencyKindConverter : JsonConverter
         string s = ((CurrencyKind) value).ToSymbol();
         if (s is null)
             throw new JsonSerializationException("Invalid currency kind");
+        writer.WriteValue(s);
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

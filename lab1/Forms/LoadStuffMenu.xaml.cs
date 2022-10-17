@@ -49,6 +49,19 @@ public class AssetLoader : IAssetLoaderService
         return AssetHelper.IsDataPathInitialized(ResourceAssembly, RequiredResourceNames, dataPath);
     }
 
+    public void ReadDomainData(DynamicCarDomain outDomain, string dataPath)
+    {
+        void Read(IList<string> output, string resourceName)
+        {
+            output.Clear();
+            var p = Path.Join(dataPath, RequiredResourceNames[0]); 
+            foreach (var country in File.ReadAllLines(p))
+                output.Add(country);
+        }
+        Read(outDomain.Countries, RequiredResourceNames[0]);
+        Read(outDomain.Manufacturers, RequiredResourceNames[1]);
+    }
+
     public void SaveCars(IEnumerable<CarModel> cars, string path)
     {
         DataHelper.WriteJson(path, CarSerializer, cars);
@@ -62,9 +75,18 @@ public class AssetLoader : IAssetLoaderService
 
 public class CarAssetModel : IAssetContext
 {
-    public string DataPath { get; set; }
+    public SessionData Session;
+    public string DataPath
+    {
+        get => Session.DataPath;
+        set => Session.DataPath = value;
+    }
     public bool IsDataDirectoryInitialized { get; set; }
-    public string CarDataPath;
+    public string CarDataPath
+    {
+        get => Session.CarDataPath;
+        set => Session.CarDataPath = value;
+    }
     public bool IsDirty { get; set; }
 }
 
@@ -150,10 +172,17 @@ public class CarAssetViewModel : INotifyPropertyChanged
         {
             if (IsDataDirectoryInitialized != value)
             {
+                bool canInitializeBefore = CanInitializeDataPath;
                 _model.IsDataDirectoryInitialized = value;
                 OnPropertyChanged(nameof(IsDataDirectoryInitialized));
+                if (canInitializeBefore != CanInitializeDataPath)
+                    OnPropertyChanged(nameof(CanInitializeDataPath));
             }
         }
+    }
+    public bool CanInitializeDataPath
+    {
+        get => !IsDataDirectoryInitialized && IsDataPathOpen;
     }
     public bool IsCarDatabaseOpen
     {
@@ -196,30 +225,49 @@ public partial class LoadStuffMenu : Window
     private CarAssetViewModel _assetViewModel;
     private CarDatabase _database;
 
-    public LoadStuffMenu(CarDatabase database, CarAssetModel carAssetModel, IAssetLoaderService assetLoader)
+    private VistaFolderBrowserDialog _selectDataPathDialog;
+    private VistaOpenFileDialog _openCarDatabaseDialog;
+    private VistaSaveFileDialog _saveCarDatabaseDialog;
+
+    public LoadStuffMenu(CarDatabase database, CarAssetViewModel assetViewModel, IAssetLoaderService assetLoader)
     {
         _database = database;
         _assetLoader = assetLoader;
-        _assetViewModel = new(carAssetModel);
+        _assetViewModel = assetViewModel;
         DataContext = _assetViewModel;
-        
 
-        _database.CarBindings.CollectionChanged += (sender, e) =>
+        _openCarDatabaseDialog = new()
         {
-            foreach (var it in e.NewItems)
-            {
-                ((CarViewModel) it).PropertyChanged += (_, _) =>
-                {
-                    // This should be under a property, with update events.
-                    _assetViewModel.IsDirty = true;
-                };
-            }
+            Title = "Select the car database file",
+            Multiselect = false,
+            AddExtension = true,
+            CheckFileExists = true,
+            DefaultExt = "json",
+            InitialDirectory = assetViewModel.DataPath,
+            FileName = assetViewModel.CarDataPath,
+        };
+
+        _saveCarDatabaseDialog = new()
+        {
+            Title = "Save the car database file",
+            AddExtension = true,
+            DefaultExt = "json",
+            InitialDirectory = assetViewModel.DataPath,
+            FileName = assetViewModel.CarDataPath,
+        };
+
+        _selectDataPathDialog = new()
+        {
+            Description = "Select the data folder",
+            UseDescriptionForTitle = true,
+            Multiselect = false,
+            SelectedPath = assetViewModel.DataPath,
         };
 
         InitializeComponent();
     }
 
-    internal void PrepareDataFolderForUse(object sender, EventArgs e)
+    internal void InitializeDataPath(object sender, EventArgs e)
     {
         if (_assetViewModel.IsDataDirectoryInitialized
             || _assetViewModel.DataPath is null)
@@ -231,24 +279,35 @@ public partial class LoadStuffMenu : Window
         _assetViewModel.IsDataDirectoryInitialized = true;
     }
 
-    internal void ShowOpenDataFolderInExplorerDialog(object sender, EventArgs e)
+    private static void ShowInExplorer(string path)
+    {
+        Process.Start("explorer.exe", path);
+    }
+
+    private static void ShowFileInExplorer(string path)
+    {
+        Process.Start("explorer.exe", $"/select, \"{path}\"");
+    }
+
+    internal void ShowDataFolderInExplorer(object sender, EventArgs e)
     {
         if (_assetViewModel.DataPath is not null)
-            Process.Start("explorer.exe", _assetViewModel.DataPath);
+            ShowInExplorer(_assetViewModel.DataPath);
+    }
+
+    internal void ShowCarDatabaseInExplorer(object sender, EventArgs e)
+    {
+        if (_assetViewModel.CarDataPath is not null)
+            ShowFileInExplorer(_assetViewModel.CarDataPath);
     }
 
     internal void ShowSelectDataFolderDialog(object sender, EventArgs e)
     {
-        var dialog = new VistaFolderBrowserDialog();
-        dialog.Description = "Select the data folder";
-        dialog.UseDescriptionForTitle = true;
-        dialog.Multiselect = false;
-        
-        if (!(dialog.ShowDialog(this) ?? false))
+        if (!(_selectDataPathDialog.ShowDialog(this) ?? false))
             return;
         
         // Same thing, should probably be moved.
-        string selectedPath = dialog.SelectedPath;
+        string selectedPath = _selectDataPathDialog.SelectedPath;
         _assetViewModel.DataPath = selectedPath;
         _assetViewModel.IsDataDirectoryInitialized = _assetLoader.CheckDataPathInitialized(selectedPath);
     }
@@ -271,23 +330,16 @@ public partial class LoadStuffMenu : Window
 
     internal void ShowOpenCarDatabaseDialog(object sender, EventArgs e)
     {
-        var dialog = new VistaOpenFileDialog();
-        dialog.Title = "Select the car database file";
-        dialog.Multiselect = false;
-        dialog.AddExtension = true;
-        dialog.CheckFileExists = true;
-        dialog.DefaultExt = "json";
-        dialog.InitialDirectory = GetDefaultSavePath();
-
-        if (!(dialog.ShowDialog(this) ?? false))
+        if (!(_openCarDatabaseDialog.ShowDialog(this) ?? false))
             return;
 
-        string selectedFile = dialog.FileName;
+        string selectedFile = _openCarDatabaseDialog.FileName;
         try
         {
             var cars = _assetLoader.LoadCars(selectedFile);
             _database.ResetCars(cars);
             _assetViewModel.IsDirty = false;
+            _assetViewModel.CarDataPath = selectedFile;
         }
         catch (Exception ex)
         {
@@ -300,12 +352,13 @@ public partial class LoadStuffMenu : Window
         }
     }
 
-    private void SaveCurrentCars()
+    private bool SaveCurrentCars()
     {
         try
         {
             _assetLoader.SaveCars(_database.Cars, _assetViewModel.CarDataPath);
             _assetViewModel.IsDirty = false;
+            return true;
         }
         catch (Exception ex)
         {
@@ -314,7 +367,7 @@ public partial class LoadStuffMenu : Window
                 "Could not save file",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
-            return;
+            return false;
         }
     }
 
@@ -322,31 +375,74 @@ public partial class LoadStuffMenu : Window
     {
         if (_assetViewModel.CarDataPath is null)
         {
-            ShowCreateNewCarDatabaseDialog(sender, e);
+            ShowSaveAsDialog(sender, e);
             return;
         }
         SaveCurrentCars();
     }
 
-    private VistaSaveFileDialog GetCarSaveFileDialog()
-    {
-        var dialog = new VistaSaveFileDialog();
-        dialog.Title = "Save the car database file";
-        dialog.AddExtension = true;
-        dialog.DefaultExt = "json";
-        dialog.InitialDirectory = GetDefaultSavePath();
-        return dialog;
-    }
-
     internal void ShowCreateNewCarDatabaseDialog(object sender, EventArgs e)
     {
-        ShowSaveAsDialog(sender, e);
+        if (_assetViewModel.IsDirty)
+        {
+            var taskDialog = new TaskDialog();
+            taskDialog.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.Yes,
+                Text = "Save",
+            });
+            taskDialog.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.No,
+                Text = "Discard",
+            });
+            taskDialog.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.Cancel,
+                Text = "Cancel",
+            });
+            taskDialog.WindowTitle = "There are unsaved changes";
+            taskDialog.CollapsedControlText = "What do I do with the unsaved changes?";
+            var button = taskDialog.Show();
+            switch (button.ButtonType)
+            {
+                case ButtonType.Yes:
+                {
+                    if (SaveCurrentCars())
+                        Reset();
+                    break;
+                }
+                case ButtonType.No:
+                {
+                    Reset();
+                    break;
+                }
+                case ButtonType.Cancel:
+                {
+                    return;
+                }
+                default:
+                {
+                    Debug.Fail("No such button type " + button.ButtonType);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            Reset();
+        }
+
+        void Reset()
+        {
+            _database.Cars.Clear();
+            _assetViewModel.CarDataPath = null;
+        }
     }
     
     internal void ShowSaveAsDialog(object sender, EventArgs e)
     {
-        var dialog = GetCarSaveFileDialog();
-        dialog.CheckFileExists = false;
+        var dialog = _saveCarDatabaseDialog;
         
         if (!(dialog.ShowDialog(this) ?? false))
             return;
@@ -355,7 +451,7 @@ public partial class LoadStuffMenu : Window
         SaveCurrentCars();
     }
 
-    
+    // Shouldn't be here. Should probably be available on the domain.
     private static readonly string[] _FirstNames = { "Steve", "John", "Maria", "Grace", };
     private static readonly string[] _LastNames = { "Smith", "Miller", "Martin", "Bower", };
 
@@ -372,13 +468,5 @@ public partial class LoadStuffMenu : Window
                 _FirstNames, _LastNames);
             cars.Add(car);
         }
-    }
-
-    private void OpenPreviousSession()
-    {
-        // TODO: save the previous path in the registry or the app config?
-        // const string carsFileName = "cars.json";
-        // if (!assets.TryReadJson(carsFileName, jsonSerializer, out List<CarModel> cars))
-        //     assets.WriteJson(carsFileName, jsonSerializer, cars);
     }
 }
