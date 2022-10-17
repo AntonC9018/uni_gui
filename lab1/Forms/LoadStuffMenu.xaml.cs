@@ -228,6 +228,7 @@ public partial class LoadStuffMenu : Window
     private VistaFolderBrowserDialog _selectDataPathDialog;
     private VistaOpenFileDialog _openCarDatabaseDialog;
     private VistaSaveFileDialog _saveCarDatabaseDialog;
+    private TaskDialog _whetherToSaveDirtiedFileDialog;
 
     public LoadStuffMenu(CarDatabase database, CarAssetViewModel assetViewModel, IAssetLoaderService assetLoader)
     {
@@ -263,6 +264,29 @@ public partial class LoadStuffMenu : Window
             Multiselect = false,
             SelectedPath = assetViewModel.DataPath,
         };
+
+        {
+            var d = new TaskDialog();
+            _whetherToSaveDirtiedFileDialog = d;
+
+            d.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.Yes,
+                Text = "Save",
+            });
+            d.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.No,
+                Text = "Discard",
+            });
+            d.Buttons.Add(new TaskDialogButton
+            {
+                ButtonType = ButtonType.Cancel,
+                Text = "Cancel",
+            });
+            d.WindowTitle = "There are unsaved changes";
+            d.CollapsedControlText = "What do I do with the unsaved changes?";
+        }
 
         InitializeComponent();
     }
@@ -383,61 +407,45 @@ public partial class LoadStuffMenu : Window
 
     internal void ShowCreateNewCarDatabaseDialog(object sender, EventArgs e)
     {
-        if (_assetViewModel.IsDirty)
-        {
-            var taskDialog = new TaskDialog();
-            taskDialog.Buttons.Add(new TaskDialogButton
-            {
-                ButtonType = ButtonType.Yes,
-                Text = "Save",
-            });
-            taskDialog.Buttons.Add(new TaskDialogButton
-            {
-                ButtonType = ButtonType.No,
-                Text = "Discard",
-            });
-            taskDialog.Buttons.Add(new TaskDialogButton
-            {
-                ButtonType = ButtonType.Cancel,
-                Text = "Cancel",
-            });
-            taskDialog.WindowTitle = "There are unsaved changes";
-            taskDialog.CollapsedControlText = "What do I do with the unsaved changes?";
-            var button = taskDialog.Show();
-            switch (button.ButtonType)
-            {
-                case ButtonType.Yes:
-                {
-                    if (SaveCurrentCars())
-                        Reset();
-                    break;
-                }
-                case ButtonType.No:
-                {
-                    Reset();
-                    break;
-                }
-                case ButtonType.Cancel:
-                {
-                    return;
-                }
-                default:
-                {
-                    Debug.Fail("No such button type " + button.ButtonType);
-                    return;
-                }
-            }
-        }
-        else
-        {
-            Reset();
-        }
-
         void Reset()
         {
             _database.Cars.Clear();
             _assetViewModel.CarDataPath = null;
         }
+
+        if (!_assetViewModel.IsDirty)
+        {
+            Reset();
+            return;
+        }
+
+        var button = _whetherToSaveDirtiedFileDialog.Show();
+        if (button is null)
+            return;
+        switch (button.ButtonType)
+        {
+            case ButtonType.Yes:
+            {
+                if (!SaveCurrentCars())
+                    return;
+                else
+                    break;
+            }
+            case ButtonType.No:
+            {
+                break;
+            }
+            case ButtonType.Cancel:
+            {
+                return;
+            }
+            default:
+            {
+                Debug.Fail("No such button type " + button.ButtonType);
+                return;
+            }
+        }
+        Reset();
     }
     
     internal void ShowSaveAsDialog(object sender, EventArgs e)
