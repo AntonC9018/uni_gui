@@ -4,9 +4,8 @@ namespace CarApp;
 
 public partial class CarDataGrid : Window
 {
-    public CarDataGrid(CarDatabase database)
+    public CarDataGrid()
     {
-        DataContext = database;
         InitializeComponent();
     }
 }

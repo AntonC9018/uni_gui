@@ -60,5 +60,7 @@
                     />
             </StackPanel>
         </GroupBox>
+        <GroupBox Header="Cars" Name="CarsGroupBox">
+        </GroupBox>
     </StackPanel>
 </Window>

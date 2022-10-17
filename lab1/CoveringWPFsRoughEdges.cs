@@ -91,6 +91,7 @@ public static partial class Properties
         "Focus",
         new PropertyMetadata(defaultValue: false, propertyChangedCallback: (sender, e) =>
         {
+            // I believe the editing template gets instantiated.
             if ((bool) e.NewValue)
                 (sender as UIElement)?.Focus();
         }));
