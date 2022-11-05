@@ -1,1 +1,23 @@
-[]
+[
+    {
+        "NumberplateText": "WJ08822",
+        "ManufacturedDate": "1906-08-19T00:00:00",
+        "ManufacturerId": 41,
+        "Price": {
+            "Value": 55807.0,
+            "Kind": "mdl"
+        },
+        "CountryId": 97,
+        "HasOwner": false,
+        "Owner": {
+            "FirstName": null,
+            "LastName": null
+        },
+        "EngineKind": "Gas",
+        "KilometersTravelled": 22208.0,
+        "NumWheels": 8,
+        "Color": {
+            "HexValue": "0xFF8F31CA"
+        }
+    }
+]

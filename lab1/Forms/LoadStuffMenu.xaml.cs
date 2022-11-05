@@ -350,7 +350,7 @@ public class CarAssetDatabaseOperations
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"Could not load file {selectedFile}: {ex.Message}.\r\n{ex.StackTrace}",
+                $"Could not load file {selectedFile}: {ex.Message}",
                 "Could not load file",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

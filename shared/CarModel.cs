@@ -158,9 +158,19 @@ public sealed class HexStringJsonConverter : JsonConverter
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         var value = reader.Value;
+        var value0 = reader.Value;
+        Debug.Assert(value == value0);
         if (value is not string str || !str.StartsWith("0x"))
-            throw new JsonSerializationException("Expected a hex string.");
-        return uint.Parse(str.AsSpan("0x".Length), System.Globalization.NumberStyles.HexNumber);
+            throw reader.ExceptionUnexpected("Expected a hex string, not");
+
+        try
+        {
+            return uint.Parse(str.AsSpan("0x".Length), System.Globalization.NumberStyles.HexNumber);
+        }
+        catch (Exception ex) when (ex is FormatException || ex is OverflowException)
+        {
+            throw reader.ExceptionUnexpected("Expected a valid hex string, not");
+        }
     }
 }
 
@@ -210,10 +220,10 @@ public sealed class CurrencyKindConverter : JsonConverter
     {
         var value = reader.Value;
         if (value is not string str)
-            throw new JsonSerializationException("Expected a currency string.");
+            throw reader.ExceptionUnexpected("Expected a currency string, not");
         var kind = CurrencyKindHelper.FromSymbol(str);
         if (!kind.HasValue)
-            throw new JsonSerializationException("Unknown currency type.");
+            throw reader.ExceptionUnexpected("Unknown currency type");
         return kind.Value;
     }
 }
@@ -248,10 +258,10 @@ public sealed class EnumAsStringsConverter<T> : JsonConverter where T : Enum
     {
         var name = reader.Value;
         if (name is not string str)
-            throw new JsonSerializationException("Expected an enum string.");
+            throw reader.ExceptionUnexpected("Expected an enum string, not");
 
         if (!NameToValue.TryGetValue(str, out T enumValue))
-            throw new JsonSerializationException($"Invalid enum value.");
+            throw reader.ExceptionUnexpected($"Unknown enum value");
 
         return enumValue;
     }
@@ -386,6 +396,32 @@ public static class CarModelUtils
             Formatting = Formatting.Indented,
             ContractResolver = OnlyFieldsResolver.Instance,
             Converters = JsonConverters,
+            TypeNameHandling = TypeNameHandling.None,
         };
+    }
+}
+public static class JsonSerializationUtils
+{
+    // Why doesn't it store this info itself?
+    // Why are the properties readonly?
+    public static JsonSerializationException Exception(this JsonReader reader, string message)
+    {
+        IJsonLineInfo lineInfo = reader as IJsonLineInfo;
+        JsonSerializationException ex;
+        if (lineInfo is not null && lineInfo.HasLineInfo())
+        {
+            message = $"{message}. Path '{reader.Path}', line {lineInfo.LineNumber}, position {lineInfo.LinePosition}.";
+            ex = new JsonSerializationException(message, reader.Path, lineInfo.LineNumber, lineInfo.LinePosition, null);
+        }
+        else
+        {
+            ex = new JsonSerializationException(message);
+        }
+        return ex;
+    }
+
+    public static JsonSerializationException ExceptionUnexpected(this JsonReader reader, string message)
+    {
+        return Exception(reader, message + " \'" + reader.Value + "\'");
     }
 }

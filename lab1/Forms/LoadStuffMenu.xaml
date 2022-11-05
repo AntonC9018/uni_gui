@@ -15,47 +15,47 @@
             Name="MainMenu"
             VerticalAlignment="Top"
             >
-            <MenuItem Header="Data">
+            <MenuItem Header="_Data">
                 <MenuItem
-                    Header="Open In Explorer"
+                    Header="Open In _Explorer"
                     Click="ShowDataFolderInExplorer"
                     IsEnabled="{Binding IsDataPathOpen}"
                     />
                 <MenuItem
-                    Header="Open"
+                    Header="_Open"
                     Click="ShowSelectDataFolderDialog"
                     />
                 <MenuItem
-                    Header="Initialize"
+                    Header="_Initialize"
                     Click="InitializeDataPath"
                     IsEnabled="{Binding CanInitializeDataPath}"
                     />
             </MenuItem>
-            <MenuItem Header="File">
+            <MenuItem Header="_File">
                 <MenuItem
-                    Header="Open"
+                    Header="_Open"
                     Click="ShowOpenCarDatabaseDialog"
                     />
                 <MenuItem
-                    Header="Open In Explorer"
+                    Header="Open In _Explorer"
                     Click="ShowCarDatabaseInExplorer"
                     IsEnabled="{Binding IsCarDatabaseOpen}"
                     />
                 <MenuItem
-                    Header="Save"
+                    Header="_Save"
                     Click="SaveCarDatabase_MaybeShowSaveAsDialog"
                     IsEnabled="{Binding IsDirty}"
                     />
                 <MenuItem
-                    Header="New"
+                    Header="_New"
                     Click="ShowCreateNewCarDatabaseDialog"
                     />
                 <MenuItem
-                    Header="Save As"
+                    Header="Save _As"
                     Click="ShowSaveAsDialog"
                     />
                 <MenuItem
-                    Header="Save on Exit"
+                    Header="Save on E_xit"
                     IsCheckable="True"
                     IsChecked="{Binding SaveOnExit}"
                     />
@@ -63,94 +63,79 @@
         </Menu>
         <ToolBar DockPanel.Dock="Top" Height="40">
             <ToolBar.Resources>
-                <Style TargetType="Control" x:Key="button">
+                <Style TargetType="Control" x:Key="buttonBase">
                     <Setter Property="Width" Value="30" />
                     <Setter Property="Height" Value="30" />
                     <Setter Property="Padding" Value="0" />
                     <Setter Property="Margin" Value="0" />
                 </Style>
-                <Style TargetType="Control" x:Key="icon">
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource buttonBase}"/>
+
+                <Style TargetType="Control" x:Key="iconBase">
                     <Setter Property="Width" Value="30" />
                     <Setter Property="Height" Value="30" />
                     <Setter Property="Padding" Value="4" />
                     <Setter Property="Margin" Value="0" />
                 </Style>
+                <Style TargetType="{x:Type icons:PackIconModern}" BasedOn="{StaticResource iconBase}"/>
             </ToolBar.Resources>
             <icons:PackIconModern
                 Kind="Database"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 Background="Gold"
-                Style="{StaticResource icon}"
                 />
             <Button 
                 ToolTip="Open"
                 Click="ShowSelectDataFolderDialog"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern
                     Kind="FolderOpen"
-                    Style="{StaticResource icon}"
                     />
                 </Button>
             <Button
                 ToolTip="Show in explorer"
                 Click="ShowDataFolderInExplorer"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern 
                     Kind="Folder"
-                    Style="{StaticResource icon}"
                     />  
             </Button>
             <Separator/>
             
             <icons:PackIconModern
                 Kind="TransitCar"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 Background="Gold"
-                Style="{StaticResource icon}"
                 />
             <Button
                 ToolTip="Save"
                 Click="SaveCarDatabase_MaybeShowSaveAsDialog"
                 IsEnabled="{Binding IsDirty}"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern
                     Kind="Save"
-                    Style="{StaticResource icon}"
                     />  
             </Button>
             <Button
                 ToolTip="Open"
                 Click="ShowOpenCarDatabaseDialog"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern
                     Kind="FolderOpen"
-                    Style="{StaticResource icon}"
                     />  
             </Button>
             <Button
                 ToolTip="Show in explorer"
                 Click="ShowCarDatabaseInExplorer"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern
                     Kind="Folder"
-                    Style="{StaticResource icon}"
                     />  
             </Button>
             <Button
                 ToolTip="Create new database"
                 Click="ShowCreateNewCarDatabaseDialog"
-                Style="{StaticResource button}"
                 >
                 <icons:PackIconModern
                     Kind="PageNew"
-                    Style="{StaticResource icon}"
                     />  
             </Button>
         </ToolBar>
