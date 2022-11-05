@@ -7,64 +7,114 @@
         xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="LoadStuffMenu">
-    <StackPanel Orientation="Vertical">
-        <GroupBox Header="Data folder">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Currently selected data folder is "/> 
-                    <Label Content="{Binding DataPath}"/> 
-                </StackPanel>
-                <Button
-                    Content="Open In Explorer"
+    <DockPanel
+        LastChildFill="false">
+        <Menu
+            DockPanel.Dock="Top"
+            Name="MainMenu"
+            VerticalAlignment="Top"
+            >
+            <MenuItem Header="Data">
+                <MenuItem
+                    Header="Open In Explorer"
                     Click="ShowDataFolderInExplorer"
                     IsEnabled="{Binding IsDataPathOpen}"
                     />
-                <Button
-                    Content="Open"
+                <MenuItem
+                    Header="Open"
                     Click="ShowSelectDataFolderDialog"
                     />
-                <Button
-                    Content="Initialize"
+                <MenuItem
+                    Header="Initialize"
                     Click="InitializeDataPath"
                     IsEnabled="{Binding CanInitializeDataPath}"
                     />
-            </StackPanel>
-        </GroupBox>
-        <GroupBox
-            Header="Car database actions"
-            >
-            <StackPanel
-                Orientation="Vertical"
-                >
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Currently selected car database is "/> 
-                    <Label Content="{Binding CarDataPath}"/> 
-                </StackPanel>
-                <Button
-                    Content="Open"
+            </MenuItem>
+            <MenuItem Header="File">
+                <MenuItem
+                    Header="Open"
                     Click="ShowOpenCarDatabaseDialog"
                     />
-                <Button
-                    Content="Open In Explorer"
+                <MenuItem
+                    Header="Open In Explorer"
                     Click="ShowCarDatabaseInExplorer"
                     IsEnabled="{Binding IsCarDatabaseOpen}"
                     />
-                <Button
-                    Content="Save"
+                <MenuItem
+                    Header="Save"
                     Click="SaveCarDatabase_MaybeShowSaveAsDialog"
                     IsEnabled="{Binding IsDirty}"
                     />
-                <Button
-                    Content="New"
+                <MenuItem
+                    Header="New"
                     Click="ShowCreateNewCarDatabaseDialog"
                     />
-                <Button
-                    Content="Save As"
+                <MenuItem
+                    Header="Save As"
                     Click="ShowSaveAsDialog"
                     />
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Cars" Name="CarsGroupBox">
-        </GroupBox>
-    </StackPanel>
+                <MenuItem
+                    Header="Save on Exit"
+                    IsCheckable="True"
+                    IsChecked="{Binding SaveOnExit}"
+                    />
+            </MenuItem>
+        </Menu>  
+        <StackPanel
+            Orientation="Vertical"
+            DockPanel.Dock="Top"
+            >
+            <GroupBox Header="Cars" Name="CarsGroupBox">
+            </GroupBox>
+        </StackPanel>
+        <StatusBar
+            DockPanel.Dock="Bottom"
+            Height="30"
+            >
+            <StatusBar.Resources>
+                <!-- https://stackoverflow.com/a/21176071/9731532 -->
+                <Style x:Key="MenuButton" TargetType="Button">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Width" Value="Auto" />
+                    <Setter Property="Foreground" Value="White" />
+                    <!-- Set solid black brush for text -->
+                    <Setter Property="BorderBrush" Value="Black" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Grid>
+                                <Border Name="MenuBorder" SnapsToDevicePixels="True" BorderBrush="Black" Background="{TemplateBinding Background}" BorderThickness="0,0,0,2" >
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Button.IsFocused" Value="True">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter TargetName="MenuBorder" Property="BorderBrush" Value="#FFED6A2B" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StatusBar.Resources>
+            <StatusBarItem>
+                <Button
+                    Style="{StaticResource MenuButton}"
+                    Content="{Binding DataPath}"
+                    Click="ShowDataFolderInExplorer"
+                    />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+               
+                <Button
+                    Style="{StaticResource MenuButton}"
+                    Content="{Binding CarDataPath}"
+                    Background="transparent"
+                    Click="ShowCarDatabaseInExplorer"
+                    />
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>
 </Window>

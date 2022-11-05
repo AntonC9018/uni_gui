@@ -124,5 +124,26 @@
     "Color": {
       "HexValue": "0xFFB3B8AE"
     }
+  },
+  {
+    "NumberplateText": "HI02441",
+    "ManufacturedDate": "1995-07-12T17:24:37.2586263",
+    "ManufacturerId": 30,
+    "Price": {
+      "Value": 82376.0,
+      "Kind": "$"
+    },
+    "CountryId": 7,
+    "HasOwner": true,
+    "Owner": {
+      "FirstName": "John",
+      "LastName": "Nume"
+    },
+    "EngineKind": "Bio",
+    "KilometersTravelled": 83472.0,
+    "NumWheels": 6,
+    "Color": {
+      "HexValue": "0xFFB3B8AE"
+    }
   }
 ]

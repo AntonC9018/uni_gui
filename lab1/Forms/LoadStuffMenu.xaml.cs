@@ -216,14 +216,159 @@ public class CarAssetViewModel : INotifyPropertyChanged
             }
         }
     }
+    public bool SaveOnExit
+    {
+        get => _model.Session.SaveOnExit;
+        set
+        {
+            if (SaveOnExit != value)
+            {
+                _model.Session.SaveOnExit = value;
+                OnPropertyChanged(nameof(SaveOnExit));
+            }
+        }
+    }
 }
 
+// It's kind of a mess, but i'm too lazy to clean it up.
+public class CarAssetDatabaseOperations
+{
+    private IAssetLoaderService AssetLoader { get; }
+    private CarAssetViewModel AssetViewModel { get; }
+    private CarDatabase Database { get; }
+
+    public CarAssetDatabaseOperations(IAssetLoaderService assetLoader, CarAssetViewModel assetViewModel, CarDatabase database)
+    {
+        AssetLoader = assetLoader;
+        AssetViewModel = assetViewModel;
+        Database = database;
+    }
+
+    public void InitializeDataPath()
+    {
+        if (AssetViewModel.IsDataDirectoryInitialized
+            || AssetViewModel.DataPath is null)
+        {
+            return;
+        }
+
+        AssetLoader.InitializeDataPath(AssetViewModel.DataPath);
+        AssetViewModel.IsDataDirectoryInitialized = true;
+    }
+
+    private static void ShowInExplorer(string path)
+    {
+        Process.Start("explorer.exe", path);
+    }
+
+    private static void ShowFileInExplorer(string path)
+    {
+        Process.Start("explorer.exe", $"/select, \"{path}\"");
+    }
+
+    public void ShowDataFolderInExplorer()
+    {
+        if (AssetViewModel.DataPath is not null)
+            ShowInExplorer(AssetViewModel.DataPath);
+    }
+
+    public void ShowCarDatabaseInExplorer()
+    {
+        if (AssetViewModel.CarDataPath is not null)
+            ShowFileInExplorer(AssetViewModel.CarDataPath);
+    }
+
+    public string GetDefaultSavePath()
+    {
+        if (AssetViewModel.CarDataPath is not null)
+        {
+            var filePath = AssetViewModel.CarDataPath;
+            var folderPath = Path.GetDirectoryName(filePath);
+            return folderPath;
+        }
+
+        if (AssetViewModel.DataPath is not null)
+            return AssetViewModel.DataPath;
+
+        Debug.Fail("The default data path should be initially set to somewhere in the appdata");
+        return null;
+    }
+
+    public bool SaveCurrentCars()
+    {
+        try
+        {
+            AssetLoader.SaveCars(Database.Cars, AssetViewModel.CarDataPath);
+            AssetViewModel.IsDirty = false;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not save file {AssetViewModel.CarDataPath}: {ex.Message}.\r\n{ex.StackTrace}",
+                "Could not save file",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return false;
+        }
+    }
+
+    public void Reset()
+    {
+        Database.Cars.Clear();
+        AssetViewModel.CarDataPath = null;
+    }
+
+    // Shouldn't be here. Should probably be available on the domain.
+    public static readonly string[] _FirstNames = { "Steve", "John", "Maria", "Grace", };
+    public static readonly string[] _LastNames = { "Smith", "Miller", "Martin", "Bower", };
+
+    public void GenerateRandomCars(Random rng, int numCarsToGenerate = 5)
+    {
+        var cars = new List<CarModel>();
+
+        for (int i = 0; i < numCarsToGenerate; i++)
+        {
+            var car = CarModelUtils.GenerateRandomModel(
+                rng,
+                Database.Domain.Manufacturers.Count,
+                Database.Domain.Countries.Count,
+                _FirstNames, _LastNames);
+            cars.Add(car);
+        }
+    }
+
+    public void LoadCarsFile(string selectedFile)
+    {
+        try
+        {
+            var cars = AssetLoader.LoadCars(selectedFile);
+            Database.ResetCars(cars);
+            AssetViewModel.IsDirty = false;
+            AssetViewModel.CarDataPath = selectedFile;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not load file {selectedFile}: {ex.Message}.\r\n{ex.StackTrace}",
+                "Could not load file",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+    }
+
+    public void SelectDataFolder(string selectedPath)
+    {
+        AssetViewModel.DataPath = selectedPath;
+        AssetViewModel.IsDataDirectoryInitialized = AssetLoader.CheckDataPathInitialized(selectedPath);
+    }
+}
 
 public partial class LoadStuffMenu : Window
 {
-    private IAssetLoaderService _assetLoader;
-    private CarAssetViewModel _assetViewModel;
-    private CarDatabase _database;
+    private CarAssetDatabaseOperations _carOperations;
+    private CarAssetViewModel AssetViewModel { get; }
 
     private VistaFolderBrowserDialog _selectDataPathDialog;
     private VistaOpenFileDialog _openCarDatabaseDialog;
@@ -231,14 +376,13 @@ public partial class LoadStuffMenu : Window
     private TaskDialog _whetherToSaveDirtiedFileDialog;
 
     public LoadStuffMenu(
-        CarDatabase database,
+        CarAssetDatabaseOperations carOperations,
         CarAssetViewModel assetViewModel,
-        IAssetLoaderService assetLoader)
+        CarDatabase database)
     {
-        _database = database;
-        _assetLoader = assetLoader;
-        _assetViewModel = assetViewModel;
-        DataContext = _assetViewModel;
+        _carOperations = carOperations;
+        AssetViewModel = assetViewModel;
+        DataContext = AssetViewModel;
 
         _openCarDatabaseDialog = new()
         {
@@ -247,8 +391,8 @@ public partial class LoadStuffMenu : Window
             AddExtension = true,
             CheckFileExists = true,
             DefaultExt = "json",
-            InitialDirectory = assetViewModel.DataPath,
-            FileName = assetViewModel.CarDataPath,
+            InitialDirectory = AssetViewModel.DataPath,
+            FileName = AssetViewModel.CarDataPath,
         };
 
         _saveCarDatabaseDialog = new()
@@ -256,8 +400,8 @@ public partial class LoadStuffMenu : Window
             Title = "Save the car database file",
             AddExtension = true,
             DefaultExt = "json",
-            InitialDirectory = assetViewModel.DataPath,
-            FileName = assetViewModel.CarDataPath,
+            InitialDirectory = AssetViewModel.DataPath,
+            FileName = AssetViewModel.CarDataPath,
         };
 
         _selectDataPathDialog = new()
@@ -265,7 +409,7 @@ public partial class LoadStuffMenu : Window
             Description = "Select the data folder",
             UseDescriptionForTitle = true,
             Multiselect = false,
-            SelectedPath = assetViewModel.DataPath,
+            SelectedPath = AssetViewModel.DataPath,
         };
 
         {
@@ -293,42 +437,8 @@ public partial class LoadStuffMenu : Window
 
         InitializeComponent();
 
-        var dataGrid = new CarDataGrid(_database);
+        var dataGrid = new CarDataGrid(database);
         CarsGroupBox.Content = dataGrid;
-    }
-
-    internal void InitializeDataPath(object sender, EventArgs e)
-    {
-        if (_assetViewModel.IsDataDirectoryInitialized
-            || _assetViewModel.DataPath is null)
-        {
-            return;
-        }
-
-        _assetLoader.InitializeDataPath(_assetViewModel.DataPath);
-        _assetViewModel.IsDataDirectoryInitialized = true;
-    }
-
-    private static void ShowInExplorer(string path)
-    {
-        Process.Start("explorer.exe", path);
-    }
-
-    private static void ShowFileInExplorer(string path)
-    {
-        Process.Start("explorer.exe", $"/select, \"{path}\"");
-    }
-
-    internal void ShowDataFolderInExplorer(object sender, EventArgs e)
-    {
-        if (_assetViewModel.DataPath is not null)
-            ShowInExplorer(_assetViewModel.DataPath);
-    }
-
-    internal void ShowCarDatabaseInExplorer(object sender, EventArgs e)
-    {
-        if (_assetViewModel.CarDataPath is not null)
-            ShowFileInExplorer(_assetViewModel.CarDataPath);
     }
 
     internal void ShowSelectDataFolderDialog(object sender, EventArgs e)
@@ -336,26 +446,8 @@ public partial class LoadStuffMenu : Window
         if (!(_selectDataPathDialog.ShowDialog(this) ?? false))
             return;
         
-        // Same thing, should probably be moved.
         string selectedPath = _selectDataPathDialog.SelectedPath;
-        _assetViewModel.DataPath = selectedPath;
-        _assetViewModel.IsDataDirectoryInitialized = _assetLoader.CheckDataPathInitialized(selectedPath);
-    }
-
-    private string GetDefaultSavePath()
-    {
-        if (_assetViewModel.CarDataPath is not null)
-        {
-            var filePath = _assetViewModel.CarDataPath;
-            var folderPath = Path.GetDirectoryName(filePath);
-            return folderPath;
-        }
-
-        if (_assetViewModel.DataPath is not null)
-            return _assetViewModel.DataPath;
-
-        Debug.Fail("The default data path should be initially set to somewhere in the appdata");
-        return null;
+        _carOperations.SelectDataFolder(selectedPath);
     }
 
     internal void ShowOpenCarDatabaseDialog(object sender, EventArgs e)
@@ -364,64 +456,24 @@ public partial class LoadStuffMenu : Window
             return;
 
         string selectedFile = _openCarDatabaseDialog.FileName;
-        try
-        {
-            var cars = _assetLoader.LoadCars(selectedFile);
-            _database.ResetCars(cars);
-            _assetViewModel.IsDirty = false;
-            _assetViewModel.CarDataPath = selectedFile;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(
-                $"Could not load file {selectedFile}: {ex.Message}.\r\n{ex.StackTrace}",
-                "Could not load file",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            return;
-        }
-    }
-
-    private bool SaveCurrentCars()
-    {
-        try
-        {
-            _assetLoader.SaveCars(_database.Cars, _assetViewModel.CarDataPath);
-            _assetViewModel.IsDirty = false;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(
-                $"Could not save file {_assetViewModel.CarDataPath}: {ex.Message}.\r\n{ex.StackTrace}",
-                "Could not save file",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            return false;
-        }
+        _carOperations.LoadCarsFile(selectedFile);
     }
 
     internal void SaveCarDatabase_MaybeShowSaveAsDialog(object sender, EventArgs e)
     {
-        if (_assetViewModel.CarDataPath is null)
+        if (AssetViewModel.CarDataPath is null)
         {
             ShowSaveAsDialog(sender, e);
             return;
         }
-        SaveCurrentCars();
+        _carOperations.SaveCurrentCars();
     }
 
     internal void ShowCreateNewCarDatabaseDialog(object sender, EventArgs e)
     {
-        void Reset()
+        if (!AssetViewModel.IsDirty)
         {
-            _database.Cars.Clear();
-            _assetViewModel.CarDataPath = null;
-        }
-
-        if (!_assetViewModel.IsDirty)
-        {
-            Reset();
+            _carOperations.Reset();
             return;
         }
 
@@ -432,7 +484,7 @@ public partial class LoadStuffMenu : Window
         {
             case ButtonType.Yes:
             {
-                if (!SaveCurrentCars())
+                if (!_carOperations.SaveCurrentCars())
                     return;
                 else
                     break;
@@ -451,7 +503,7 @@ public partial class LoadStuffMenu : Window
                 return;
             }
         }
-        Reset();
+        _carOperations.Reset();
     }
     
     internal void ShowSaveAsDialog(object sender, EventArgs e)
@@ -461,26 +513,22 @@ public partial class LoadStuffMenu : Window
         if (!(dialog.ShowDialog(this) ?? false))
             return;
 
-        _assetViewModel.CarDataPath = dialog.FileName;
-        SaveCurrentCars();
+        AssetViewModel.CarDataPath = dialog.FileName;
+        _carOperations.SaveCurrentCars();
     }
 
-    // Shouldn't be here. Should probably be available on the domain.
-    private static readonly string[] _FirstNames = { "Steve", "John", "Maria", "Grace", };
-    private static readonly string[] _LastNames = { "Smith", "Miller", "Martin", "Bower", };
-
-    internal void GenerateRandomCars(Random rng, int numCarsToGenerate = 5)
+    internal void ShowDataFolderInExplorer(object sender, EventArgs e)
     {
-        var cars = new List<CarModel>();
+        _carOperations.ShowDataFolderInExplorer();
+    }
 
-        for (int i = 0; i < numCarsToGenerate; i++)
-        {
-            var car = CarModelUtils.GenerateRandomModel(
-                rng,
-                _database.Domain.Manufacturers.Count,
-                _database.Domain.Countries.Count,
-                _FirstNames, _LastNames);
-            cars.Add(car);
-        }
+    internal void InitializeDataPath(object sender, EventArgs e)
+    {
+        _carOperations.InitializeDataPath();
+    }
+
+    internal void ShowCarDatabaseInExplorer(object sender, EventArgs e)
+    {
+        _carOperations.ShowCarDatabaseInExplorer();
     }
 }

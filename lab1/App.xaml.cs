@@ -47,6 +47,7 @@ public class SessionData
 {
     public string DataPath { get; set; }
     public string CarDataPath { get; set; }
+    public bool SaveOnExit { get; set; }
 }
 
 public class AppCache
@@ -75,11 +76,6 @@ public partial class App : Application
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             e.Handled = true;
-        };
-
-        this.Exit += (_, _) =>
-        {
-            SerializeCache();
         };
 
         var resourceAssembly = Assembly.GetExecutingAssembly();
@@ -144,6 +140,7 @@ public partial class App : Application
             IsDirty = false,
         };
         var carAssetViewModel = new CarAssetViewModel(carAssetModel);
+        var carOperations = new CarAssetDatabaseOperations(assetLoader, carAssetViewModel, database);
 
         if (isDataDirectoryInitialized)
             assetLoader.ReadDomainData(domain, session.DataPath);
@@ -154,8 +151,7 @@ public partial class App : Application
             {
                 try
                 {
-                    var cars = assetLoader.LoadCars(session.CarDataPath);
-                    database.ResetCars(cars);
+                    carOperations.LoadCarsFile(session.CarDataPath);
                 }
                 catch (JsonException exc)
                 {
@@ -183,7 +179,14 @@ public partial class App : Application
             }
         };
 
-        var form = new LoadStuffMenu(database, carAssetViewModel, assetLoader);
+        this.Exit += (_, _) =>
+        {
+            SerializeCache();
+            if (_appCache.LastSession.SaveOnExit)
+                carOperations.SaveCurrentCars();
+        };
+
+        var form = new LoadStuffMenu(carOperations, carAssetViewModel, database);
         form.Show();
     }
 }
