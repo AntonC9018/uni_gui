@@ -65,7 +65,7 @@ public partial class CarDataGrid : UserControl
         if (Grid.SelectedIndex != -1)
             copy = cars[Grid.SelectedIndex].Copy();
         else if (cars.Count > 0)
-            copy = cars[^1];
+            copy = cars[^1].Copy();
         else
             copy = new CarModel();
         cars.Add(copy);

@@ -145,19 +145,6 @@ public partial class App : Application
         };
         var carAssetViewModel = new CarAssetViewModel(carAssetModel);
 
-        database.CarBindings.CollectionChanged += (sender, e) =>
-        {
-            if (e.NewItems is null)
-                return;
-            foreach (var it in e.NewItems)
-            {
-                ((CarViewModel) it).PropertyChanged += (_, _) =>
-                {
-                    carAssetViewModel.IsDirty = true;
-                };
-            }
-        };
-
         if (isDataDirectoryInitialized)
             assetLoader.ReadDomainData(domain, session.DataPath);
 
@@ -181,6 +168,20 @@ public partial class App : Application
                 session.CarDataPath = null;
             }
         }
+        
+        database.CarBindings.CollectionChanged += (sender, e) =>
+        {
+            carAssetViewModel.IsDirty = true;
+            if (e.NewItems is null)
+                return;
+            foreach (var it in e.NewItems)
+            {
+                ((CarViewModel) it).PropertyChanged += (_, _) =>
+                {
+                    carAssetViewModel.IsDirty = true;
+                };
+            }
+        };
 
         var form = new LoadStuffMenu(database, carAssetViewModel, assetLoader);
         form.Show();

@@ -14,6 +14,20 @@
             AutoGenerateColumns="false"
             Name="Grid"
             >
+            <DataGrid.ContextMenu>
+                <ContextMenu StaysOpen="true">
+                    <MenuItem
+                        Header="Add"
+                        IsEnabled="{Binding CanAddCar}"
+                        Click="AddNewCar"
+                        />
+                    <MenuItem
+                        Header="Remove"
+                        IsEnabled="{Binding CanRemoveCar}"
+                        Click="RemoveCurrentCar"
+                        />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Header="Manufactured On"
