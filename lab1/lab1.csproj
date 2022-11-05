@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <ProjectReference Include="..\shared\shared.csproj" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

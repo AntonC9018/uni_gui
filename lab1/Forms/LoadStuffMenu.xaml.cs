@@ -418,21 +418,18 @@ public partial class LoadStuffMenu : Window
 
             d.Buttons.Add(new TaskDialogButton
             {
-                ButtonType = ButtonType.Yes,
                 Text = "Save",
             });
             d.Buttons.Add(new TaskDialogButton
             {
-                ButtonType = ButtonType.No,
                 Text = "Discard",
             });
             d.Buttons.Add(new TaskDialogButton
             {
-                ButtonType = ButtonType.Cancel,
                 Text = "Cancel",
             });
             d.WindowTitle = "There are unsaved changes";
-            d.CollapsedControlText = "What do I do with the unsaved changes?";
+            d.Content = "What do I do with the unsaved changes?";
         }
 
         InitializeComponent();
@@ -443,7 +440,7 @@ public partial class LoadStuffMenu : Window
 
     internal void ShowSelectDataFolderDialog(object sender, EventArgs e)
     {
-        if (!(_selectDataPathDialog.ShowDialog(this) ?? false))
+        if (_selectDataPathDialog.ShowDialog(this) is false or null)
             return;
         
         string selectedPath = _selectDataPathDialog.SelectedPath;
@@ -452,7 +449,7 @@ public partial class LoadStuffMenu : Window
 
     internal void ShowOpenCarDatabaseDialog(object sender, EventArgs e)
     {
-        if (!(_openCarDatabaseDialog.ShowDialog(this) ?? false))
+        if (_openCarDatabaseDialog.ShowDialog(this) is false or null)
             return;
 
         string selectedFile = _openCarDatabaseDialog.FileName;
@@ -480,26 +477,27 @@ public partial class LoadStuffMenu : Window
         var button = _whetherToSaveDirtiedFileDialog.Show();
         if (button is null)
             return;
-        switch (button.ButtonType)
+        switch (button.Text)
         {
-            case ButtonType.Yes:
+            case "Save":
             {
+                if (AssetViewModel.CarDataPath is null)
+                {
+                    ShowSaveAsDialog(sender, e);
+                    return;
+                }
                 if (!_carOperations.SaveCurrentCars())
                     return;
                 else
                     break;
             }
-            case ButtonType.No:
-            {
+            case "Discard":
                 break;
-            }
-            case ButtonType.Cancel:
-            {
+            case "Cancel":
                 return;
-            }
             default:
             {
-                Debug.Fail("No such button type " + button.ButtonType);
+                Debug.Fail("No such button " + button.Text);
                 return;
             }
         }
@@ -510,7 +508,7 @@ public partial class LoadStuffMenu : Window
     {
         var dialog = _saveCarDatabaseDialog;
         
-        if (!(dialog.ShowDialog(this) ?? false))
+        if (dialog.ShowDialog(this) is false or null)
             return;
 
         AssetViewModel.CarDataPath = dialog.FileName;

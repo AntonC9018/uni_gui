@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarApp"
         xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         Title="LoadStuffMenu">
     <DockPanel
@@ -59,7 +60,100 @@
                     IsChecked="{Binding SaveOnExit}"
                     />
             </MenuItem>
-        </Menu>  
+        </Menu>
+        <ToolBar DockPanel.Dock="Top" Height="40">
+            <ToolBar.Resources>
+                <Style TargetType="Control" x:Key="button">
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+                <Style TargetType="Control" x:Key="icon">
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="Padding" Value="4" />
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </ToolBar.Resources>
+            <icons:PackIconModern
+                Kind="Database"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Background="Gold"
+                Style="{StaticResource icon}"
+                />
+            <Button 
+                ToolTip="Open"
+                Click="ShowSelectDataFolderDialog"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern
+                    Kind="FolderOpen"
+                    Style="{StaticResource icon}"
+                    />
+                </Button>
+            <Button
+                ToolTip="Show in explorer"
+                Click="ShowDataFolderInExplorer"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern 
+                    Kind="Folder"
+                    Style="{StaticResource icon}"
+                    />  
+            </Button>
+            <Separator/>
+            
+            <icons:PackIconModern
+                Kind="TransitCar"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Background="Gold"
+                Style="{StaticResource icon}"
+                />
+            <Button
+                ToolTip="Save"
+                Click="SaveCarDatabase_MaybeShowSaveAsDialog"
+                IsEnabled="{Binding IsDirty}"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern
+                    Kind="Save"
+                    Style="{StaticResource icon}"
+                    />  
+            </Button>
+            <Button
+                ToolTip="Open"
+                Click="ShowOpenCarDatabaseDialog"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern
+                    Kind="FolderOpen"
+                    Style="{StaticResource icon}"
+                    />  
+            </Button>
+            <Button
+                ToolTip="Show in explorer"
+                Click="ShowCarDatabaseInExplorer"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern
+                    Kind="Folder"
+                    Style="{StaticResource icon}"
+                    />  
+            </Button>
+            <Button
+                ToolTip="Create new database"
+                Click="ShowCreateNewCarDatabaseDialog"
+                Style="{StaticResource button}"
+                >
+                <icons:PackIconModern
+                    Kind="PageNew"
+                    Style="{StaticResource icon}"
+                    />  
+            </Button>
+        </ToolBar>
         <StackPanel
             Orientation="Vertical"
             DockPanel.Dock="Top"
@@ -72,30 +166,11 @@
             Height="30"
             >
             <StatusBar.Resources>
-                <!-- https://stackoverflow.com/a/21176071/9731532 -->
                 <Style x:Key="MenuButton" TargetType="Button">
                     <Setter Property="Background" Value="Transparent"/>
                     <Setter Property="Width" Value="Auto" />
-                    <Setter Property="Foreground" Value="White" />
-                    <!-- Set solid black brush for text -->
-                    <Setter Property="BorderBrush" Value="Black" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Grid>
-                                <Border Name="MenuBorder" SnapsToDevicePixels="True" BorderBrush="Black" Background="{TemplateBinding Background}" BorderThickness="0,0,0,2" >
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                </Grid>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="Button.IsFocused" Value="True">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter TargetName="MenuBorder" Property="BorderBrush" Value="#FFED6A2B" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="BorderThickness" Value="0" />
                 </Style>
             </StatusBar.Resources>
             <StatusBarItem>
@@ -107,11 +182,9 @@
             </StatusBarItem>
             <Separator />
             <StatusBarItem>
-               
                 <Button
                     Style="{StaticResource MenuButton}"
                     Content="{Binding CarDataPath}"
-                    Background="transparent"
                     Click="ShowCarDatabaseInExplorer"
                     />
             </StatusBarItem>
