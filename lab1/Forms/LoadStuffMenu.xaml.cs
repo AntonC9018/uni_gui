@@ -144,6 +144,11 @@ public static class AssetHelper
 }
 
 
+// This is currently also two things:
+// 1. the view model for the elements on the window;
+// 2. the "reactive context", aka the properties have to be modified on this object
+//    in order to be reflected in the UI.
+// The messy part is that some application code actually depends on the events here.
 public class CarAssetViewModel : INotifyPropertyChanged
 {
     private CarAssetModel _model;
