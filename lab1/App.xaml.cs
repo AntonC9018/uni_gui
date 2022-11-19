@@ -48,6 +48,8 @@ public class SessionData
     public string DataPath { get; set; }
     public string CarDataPath { get; set; }
     public bool SaveOnExit { get; set; }
+    public bool ShowToolBar { get; set; } = true;
+    public bool ShowStatusBar { get; set; } = true;
 }
 
 public class AppCache
@@ -145,6 +147,20 @@ public partial class App : Application
         if (isDataDirectoryInitialized)
             assetLoader.ReadDomainData(domain, session.DataPath);
 
+        database.CarBindings.CollectionChanged += (sender, e) =>
+        {
+            carAssetViewModel.IsDirty = true;
+            if (e.NewItems is null)
+                return;
+            foreach (var it in e.NewItems)
+            {
+                ((CarViewModel) it).PropertyChanged += (_, _) =>
+                {
+                    carAssetViewModel.IsDirty = true;
+                };
+            }
+        };
+
         if (session.CarDataPath is not null)
         {
             if (File.Exists(session.CarDataPath))
@@ -164,20 +180,6 @@ public partial class App : Application
                 session.CarDataPath = null;
             }
         }
-        
-        database.CarBindings.CollectionChanged += (sender, e) =>
-        {
-            carAssetViewModel.IsDirty = true;
-            if (e.NewItems is null)
-                return;
-            foreach (var it in e.NewItems)
-            {
-                ((CarViewModel) it).PropertyChanged += (_, _) =>
-                {
-                    carAssetViewModel.IsDirty = true;
-                };
-            }
-        };
 
         this.Exit += (_, _) =>
         {

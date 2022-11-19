@@ -60,8 +60,29 @@
                     IsChecked="{Binding SaveOnExit}"
                     />
             </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem
+                    IsChecked="{Binding IsShowToolBar}"
+                    IsCheckable="True"
+                    Header="Show _Tool Bar"
+                    />
+                <MenuItem
+                    IsChecked="{Binding IsShowStatusBar}"
+                    IsCheckable="True"
+                    Header="Show _Status Bar"
+                    />
+            </MenuItem>
+            <MenuItem
+                Header="_About"
+                Click="ShowAboutDialog"
+                >
+            </MenuItem>
         </Menu>
-        <ToolBar DockPanel.Dock="Top" Height="40">
+        <ToolBar
+            DockPanel.Dock="Top"
+            Height="40"
+            Visibility="{Binding ToolBarVisibility}"
+            >
             <ToolBar.Resources>
                 <Style TargetType="Control" x:Key="buttonBase">
                     <Setter Property="Width" Value="30" />
@@ -82,9 +103,10 @@
             <icons:PackIconModern
                 Kind="Database"
                 Background="Gold"
+                ToolTip="Database actions"
                 />
             <Button 
-                ToolTip="Open"
+                ToolTip="Open database"
                 Click="ShowSelectDataFolderDialog"
                 >
                 <icons:PackIconModern
@@ -92,7 +114,7 @@
                     />
                 </Button>
             <Button
-                ToolTip="Show in explorer"
+                ToolTip="Show database in explorer"
                 Click="ShowDataFolderInExplorer"
                 >
                 <icons:PackIconModern 
@@ -104,9 +126,10 @@
             <icons:PackIconModern
                 Kind="TransitCar"
                 Background="Gold"
+                ToolTip="Cars"
                 />
             <Button
-                ToolTip="Save"
+                ToolTip="Save cars"
                 Click="SaveCarDatabase_MaybeShowSaveAsDialog"
                 IsEnabled="{Binding IsDirty}"
                 >
@@ -115,7 +138,7 @@
                     />  
             </Button>
             <Button
-                ToolTip="Open"
+                ToolTip="Open cars"
                 Click="ShowOpenCarDatabaseDialog"
                 >
                 <icons:PackIconModern
@@ -123,7 +146,7 @@
                     />  
             </Button>
             <Button
-                ToolTip="Show in explorer"
+                ToolTip="Show cars in explorer"
                 Click="ShowCarDatabaseInExplorer"
                 >
                 <icons:PackIconModern
@@ -131,7 +154,7 @@
                     />  
             </Button>
             <Button
-                ToolTip="Create new database"
+                ToolTip="Create new cars database"
                 Click="ShowCreateNewCarDatabaseDialog"
                 >
                 <icons:PackIconModern
@@ -149,6 +172,7 @@
         <StatusBar
             DockPanel.Dock="Bottom"
             Height="30"
+            Visibility="{Binding StatusBarVisibility}"
             >
             <StatusBar.Resources>
                 <Style x:Key="MenuButton" TargetType="Button">
@@ -163,6 +187,7 @@
                     Style="{StaticResource MenuButton}"
                     Content="{Binding DataPath}"
                     Click="ShowDataFolderInExplorer"
+                    ToolTip="Data folder"
                     />
             </StatusBarItem>
             <Separator />
@@ -171,6 +196,7 @@
                     Style="{StaticResource MenuButton}"
                     Content="{Binding CarDataPath}"
                     Click="ShowCarDatabaseInExplorer"
+                    ToolTip="Car database file"
                     />
             </StatusBarItem>
         </StatusBar>

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using CarApp.Assets;
 using CarApp.Model;
 using Newtonsoft.Json;
@@ -88,6 +89,16 @@ public class CarAssetModel : IAssetContext
         set => Session.CarDataPath = value;
     }
     public bool IsDirty { get; set; }
+    public bool ShowToolBar
+    {
+        get => Session.ShowToolBar;
+        set => Session.ShowToolBar = value;
+    }
+    public bool ShowStatusBar
+    {
+        get => Session.ShowStatusBar;
+        set => Session.ShowStatusBar = value;
+    }
 }
 
 public static class AssetHelper
@@ -227,6 +238,44 @@ public class CarAssetViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(SaveOnExit));
             }
         }
+    }
+
+    public bool IsShowStatusBar
+    {
+        get => _model.Session.ShowStatusBar;
+        set
+        {
+            if (IsShowStatusBar != value)
+            {
+                _model.Session.ShowStatusBar = value;
+                OnPropertyChanged(nameof(IsShowStatusBar));
+                OnPropertyChanged(nameof(StatusBarVisibility));
+            }
+        }
+    }
+
+    public bool IsShowToolBar
+    {
+        get => _model.Session.ShowToolBar;
+        set
+        {
+            if (IsShowToolBar != value)
+            {
+                _model.Session.ShowToolBar = value;
+                OnPropertyChanged(nameof(IsShowToolBar));
+                OnPropertyChanged(nameof(ToolBarVisibility));
+            }
+        }
+    }
+
+    public Visibility StatusBarVisibility
+    {
+        get => IsShowStatusBar ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public Visibility ToolBarVisibility
+    {
+        get => IsShowToolBar ? Visibility.Visible : Visibility.Collapsed;
     }
 }
 
@@ -528,5 +577,16 @@ public partial class LoadStuffMenu : Window
     internal void ShowCarDatabaseInExplorer(object sender, EventArgs e)
     {
         _carOperations.ShowCarDatabaseInExplorer();
+    }
+
+    internal void ShowAboutDialog(object sender, RoutedEventArgs args)
+    {
+        MessageBox.Show(@"Dialog application for university.
+
+Author: Curmanschii Anton
+Email: example@domain.com",
+            "About",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
     }
 }
