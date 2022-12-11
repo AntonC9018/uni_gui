@@ -6,7 +6,7 @@ public partial class CarForm : UserControl
 {
     public CarForm(CarViewModel viewModel)
     {
-        InitializeComponent();
         DataContext = viewModel;
+        InitializeComponent();
     }
 }

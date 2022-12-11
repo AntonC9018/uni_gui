@@ -25,14 +25,12 @@
 
         <Label Content="Numberplate Text"/>
         <TextBox
-            local:Properties.Focus="True"
             Text="{local:ReactiveBinding NumberplateText}"
             Validation.ErrorTemplate="{StaticResource validationTemplate}"
             />
 
         <Label Content="Manufacturer"/>
         <ComboBox
-            local:Properties.Focus="True"
             ItemsSource="{Binding Path=Domain.Manufacturers}"
             SelectedIndex="{local:ReactiveBinding ManufacturerId}"
             Validation.ErrorTemplate="{StaticResource validationTemplate}"
@@ -40,7 +38,6 @@
 
         <Label Content="Country"/>
         <ComboBox
-            local:Properties.Focus="True"
             ItemsSource="{Binding Path=Domain.Countries}"
             SelectedIndex="{local:ReactiveBinding CountryId}"
             Validation.ErrorTemplate="{StaticResource validationTemplate}"
@@ -48,7 +45,6 @@
 
         <Label Content="Engine Kind"/>
         <ComboBox
-            local:Properties.Focus="True"
             ItemsSource="{Binding Path=Domain.EngineKinds}"
             SelectedIndex="{local:ReactiveBinding EngineKindIndex}"
             Validation.ErrorTemplate="{StaticResource validationTemplate}"
@@ -57,7 +53,6 @@
         <Label Content="Price"/>
         <StackPanel Orientation="Horizontal">
             <toolkit:DoubleUpDown
-                local:Properties.Focus="True"
                 Value="{
                     local:ReactiveBinding Price_Value,
                     StringFormat='#.00'
@@ -77,7 +72,6 @@
             <StackPanel Orientation="Vertical">
                 <Label Content="Has Owner"/>
                 <CheckBox
-                    local:Properties.Focus="True"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsChecked="{local:ReactiveBinding HasOwner}"
@@ -86,7 +80,6 @@
 
                 <Label Content="Owner First Name"/>
                 <TextBox
-                    local:Properties.Focus="True"
                     Text="{local:ReactiveBinding Owner_FirstName}"
                     IsEnabled="{Binding HasOwner}"
                     Validation.ErrorTemplate="{StaticResource validationTemplate}"
@@ -94,7 +87,6 @@
 
                 <Label Content="Owner Last Name"/>
                 <TextBox
-                    local:Properties.Focus="True"
                     Text="{local:ReactiveBinding Owner_LastName}"
                     IsEnabled="{Binding HasOwner}"
                     Validation.ErrorTemplate="{StaticResource validationTemplate}"
@@ -104,14 +96,12 @@
         
         <Label Content="Color"/>
         <toolkit:ColorPicker
-            local:Properties.Focus="True"
             SelectedColor="{local:ReactiveBinding Windows_Media_Color}"
             Validation.ErrorTemplate="{StaticResource validationTemplate}"
             />
 
         <Label Content="Kilometers Traveled"/>
         <toolkit:IntegerUpDown
-            local:Properties.Focus="True"
             Value="{
                 local:ReactiveBinding KilometersTravelled,
                 StringFormat='#'

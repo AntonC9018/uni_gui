@@ -13,6 +13,7 @@
             ItemsSource="{Binding Path=Database.CarBindings}"
             AutoGenerateColumns="false"
             Name="Grid"
+            SelectedIndex="{Binding Path=SelectedIndex}"
             >
             <DataGrid.ContextMenu>
                 <ContextMenu StaysOpen="true">
@@ -25,6 +26,11 @@
                         Header="Remove"
                         IsEnabled="{Binding CanRemoveCar}"
                         Click="RemoveCurrentCar"
+                        />
+                    <MenuItem
+                        Header="Pop into new document"
+                        IsEnabled="{Binding CanPopCarIntoNewDocument}"
+                        Click="PopCarIntoNewDocument"
                         />
                 </ContextMenu>
             </DataGrid.ContextMenu>

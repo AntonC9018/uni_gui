@@ -3,13 +3,30 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Controls;
+using AvalonDock.Layout;
 using CarApp.Model;
 
 namespace CarApp;
 
 public class CarDataGridViewModel : INotifyPropertyChanged
 {
+    private int _selectedIndex = -1;
+    public int SelectedIndex
+    {
+        get => _selectedIndex;
+        set
+        {
+            if (_selectedIndex != value)
+            {
+                _selectedIndex = value;
+                OnPropertyChanged(nameof(SelectedIndex));
+                OnPropertyChanged(nameof(CanPopCarIntoNewDocument));
+            }
+        }
+    }
+
     public CarDatabase Database { get; }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public CarDataGridViewModel(CarDatabase database)
@@ -39,18 +56,27 @@ public class CarDataGridViewModel : INotifyPropertyChanged
     {
         get => Database.Cars.Count > 0;
     }
+
+    public bool CanPopCarIntoNewDocument
+    {
+        get => Database.Cars.Count > 0 && SelectedIndex != -1;
+    }
 }
 
 public partial class CarDataGrid : UserControl
 {
+    private readonly LayoutDocumentPaneGroup _paneGroup;
+
     private CarDataGridViewModel ViewModel
     {
         get => (CarDataGridViewModel) DataContext;
         set => DataContext = value;
     }
     
-    public CarDataGrid(CarDatabase database)
+    public CarDataGrid(CarDatabase database, LayoutDocumentPaneGroup paneGroup)
     {
+        _paneGroup = paneGroup;
+
         ViewModel = new CarDataGridViewModel(database);
         InitializeComponent();
     }
@@ -62,22 +88,40 @@ public partial class CarDataGrid : UserControl
     {
         var cars = Cars;
         CarModel copy;
-        if (Grid.SelectedIndex != -1)
-            copy = cars[Grid.SelectedIndex].Copy();
+        if (ViewModel.SelectedIndex != -1)
+            copy = cars[ViewModel.SelectedIndex].Copy();
         else if (cars.Count > 0)
             copy = cars[^1].Copy();
         else
             copy = new CarModel();
         cars.Add(copy);
-        Grid.SelectedIndex = cars.Count - 1;
+        ViewModel.SelectedIndex = cars.Count - 1;
     }
 
     internal void RemoveCurrentCar(object sender, EventArgs e)
     {
         var cars = Cars;
-        if (Grid.SelectedIndex != -1)
-            cars.RemoveAt(Grid.SelectedIndex);
+        if (ViewModel.SelectedIndex != -1)
+            cars.RemoveAt(ViewModel.SelectedIndex);
         else if (cars.Count > 0)
             cars.RemoveAt(cars.Count - 1);
+    }
+
+    internal void PopCarIntoNewDocument(object sender, EventArgs e)
+    {
+        int selectedIndex = ViewModel.SelectedIndex;
+        if (selectedIndex == -1)
+            return;
+
+        var car = ViewModel.Database.CarBindings[selectedIndex];
+        var documentPane = new LayoutDocumentPane();
+        var document = new LayoutDocument
+        {
+            Title = car.NumberplateText,
+            Content = new CarForm(car)
+        };
+        documentPane.Children.Add(document);
+        _paneGroup.Children.Add(documentPane);
+        document.IsActive = true;
     }
 }

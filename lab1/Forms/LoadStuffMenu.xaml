@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CarApp"
         xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
         mc:Ignorable="d"
         Title="LoadStuffMenu">
     <DockPanel
@@ -166,8 +167,52 @@
             Orientation="Vertical"
             DockPanel.Dock="Top"
             >
-            <GroupBox Header="Cars" Name="CarsGroupBox">
-            </GroupBox>
+            <avalonDock:DockingManager
+                x:Name="DockManager"
+                AllowMixedOrientation="True"
+                AutoWindowSizeWhenOpened="True"
+                IsVirtualizingAnchorable="True"
+                IsVirtualizingDocument="True"
+                >
+                <avalonDock:DockingManager.Theme>
+                    <Vs2013LightTheme/>
+                </avalonDock:DockingManager.Theme>
+                
+                <avalonDock:DockingManager.DocumentHeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Margin="0,0,4,0"
+                                Source="{Binding IconSource}"
+                                />
+                            <TextBlock
+                                Text="{Binding Title}"
+                                TextTrimming="CharacterEllipsis"
+                                />
+                        </StackPanel>
+                    </DataTemplate>
+                </avalonDock:DockingManager.DocumentHeaderTemplate>
+
+                <avalonDock:LayoutRoot>
+                    <LayoutPanel Orientation="Horizontal">
+                        <avalonDock:LayoutDocumentPaneGroup
+                            x:Name="PaneGroup"
+                            >
+                            <avalonDock:LayoutDocumentPane>
+                                <avalonDock:LayoutDocument
+                                    Title="Document"
+                                    ContentId="document"
+                                    >
+                                    <GroupBox
+                                        Header="Cars"
+                                        Name="CarsGroupBox"
+                                        />
+                                </avalonDock:LayoutDocument>
+                            </avalonDock:LayoutDocumentPane>
+                        </avalonDock:LayoutDocumentPaneGroup>
+                    </LayoutPanel>
+                </avalonDock:LayoutRoot>
+            </avalonDock:DockingManager>
         </StackPanel>
         <StatusBar
             DockPanel.Dock="Bottom"
