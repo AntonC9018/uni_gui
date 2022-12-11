@@ -488,7 +488,7 @@ public partial class LoadStuffMenu : Window
 
         InitializeComponent();
 
-        var dataGrid = new CarDataGrid(database, PaneGroup);
+        var dataGrid = new CarDataGrid(database, CarsPane);
         CarsGroupBox.Content = dataGrid;
     }
 

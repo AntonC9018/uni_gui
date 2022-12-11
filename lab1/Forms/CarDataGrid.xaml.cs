@@ -65,7 +65,7 @@ public class CarDataGridViewModel : INotifyPropertyChanged
 
 public partial class CarDataGrid : UserControl
 {
-    private readonly LayoutDocumentPaneGroup _paneGroup;
+    private readonly LayoutDocumentPane _pane;
 
     private CarDataGridViewModel ViewModel
     {
@@ -73,9 +73,9 @@ public partial class CarDataGrid : UserControl
         set => DataContext = value;
     }
     
-    public CarDataGrid(CarDatabase database, LayoutDocumentPaneGroup paneGroup)
+    public CarDataGrid(CarDatabase database, LayoutDocumentPane pane)
     {
-        _paneGroup = paneGroup;
+        _pane = pane;
 
         ViewModel = new CarDataGridViewModel(database);
         InitializeComponent();
@@ -114,14 +114,12 @@ public partial class CarDataGrid : UserControl
             return;
 
         var car = ViewModel.Database.CarBindings[selectedIndex];
-        var documentPane = new LayoutDocumentPane();
         var document = new LayoutDocument
         {
             Title = car.NumberplateText,
             Content = new CarForm(car)
         };
-        documentPane.Children.Add(document);
-        _paneGroup.Children.Add(documentPane);
+        _pane.Children.Add(document);
         document.IsActive = true;
     }
 }

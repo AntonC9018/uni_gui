@@ -8,107 +8,110 @@
     xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
     mc:Ignorable="d">
 
-    <UserControl.DataContext>
-        <local:CarViewModel/>
-    </UserControl.DataContext>
-
-    <StackPanel Orientation="Vertical">
-        <!-- 
-            Essentially copy-paste from CarDataGrid.
-            WPF doesn't allow one to factor this out easily, especially the bindings.
-        -->
-        <Label Content="Manufactured On"/>
-        <DatePicker
-            SelectedDate="{local:ReactiveBinding ManufacturedDate}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-
-        <Label Content="Numberplate Text"/>
-        <TextBox
-            Text="{local:ReactiveBinding NumberplateText}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-
-        <Label Content="Manufacturer"/>
-        <ComboBox
-            ItemsSource="{Binding Path=Domain.Manufacturers}"
-            SelectedIndex="{local:ReactiveBinding ManufacturerId}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-
-        <Label Content="Country"/>
-        <ComboBox
-            ItemsSource="{Binding Path=Domain.Countries}"
-            SelectedIndex="{local:ReactiveBinding CountryId}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-
-        <Label Content="Engine Kind"/>
-        <ComboBox
-            ItemsSource="{Binding Path=Domain.EngineKinds}"
-            SelectedIndex="{local:ReactiveBinding EngineKindIndex}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-
-        <Label Content="Price"/>
-        <StackPanel Orientation="Horizontal">
-            <toolkit:DoubleUpDown
-                Value="{
-                    local:ReactiveBinding Price_Value,
-                    StringFormat='#.00'
-                }"
-                Increment="10"
-                Minimum="0.01"
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        VerticalAlignment="Top"
+        >
+        <StackPanel Orientation="Vertical">
+            <!-- 
+                Essentially copy-paste from CarDataGrid.
+                WPF doesn't allow one to factor this out easily, especially the bindings.
+            -->
+            <Label Content="Manufactured On"/>
+            <DatePicker
+                SelectedDate="{Binding ManufacturedDate}"
                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                 />
+
+            <Label Content="Numberplate Text"/>
+            <TextBox
+                Text="{Binding NumberplateText}"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+
+            <Label Content="Manufacturer"/>
             <ComboBox
-                ItemsSource="{Binding Path=Domain.CurrencyKinds}"
-                SelectedIndex="{local:ReactiveBinding Price_KindIndex}"
+                ItemsSource="{Binding Path=Domain.Manufacturers}"
+                SelectedIndex="{Binding ManufacturerId}"
                 Validation.ErrorTemplate="{StaticResource validationTemplate}"
                 />
-        </StackPanel>
 
-        <GroupBox Header="Owner">
-            <StackPanel Orientation="Vertical">
-                <Label Content="Has Owner"/>
-                <CheckBox
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    IsChecked="{local:ReactiveBinding HasOwner}"
+            <Label Content="Country"/>
+            <ComboBox
+                ItemsSource="{Binding Path=Domain.Countries}"
+                SelectedIndex="{Binding CountryId}"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+
+            <Label Content="Engine Kind"/>
+            <ComboBox
+                ItemsSource="{Binding Path=Domain.EngineKinds}"
+                SelectedIndex="{Binding EngineKindIndex}"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+
+            <Label Content="Price"/>
+            <StackPanel Orientation="Horizontal">
+                <toolkit:DoubleUpDown
+                    Value="{
+                        Binding Price_Value,
+                        StringFormat='#.00'
+                    }"
+                    Increment="10"
+                    Minimum="0.01"
                     Validation.ErrorTemplate="{StaticResource validationTemplate}"
                     />
-
-                <Label Content="Owner First Name"/>
-                <TextBox
-                    Text="{local:ReactiveBinding Owner_FirstName}"
-                    IsEnabled="{Binding HasOwner}"
-                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
-                    />
-
-                <Label Content="Owner Last Name"/>
-                <TextBox
-                    Text="{local:ReactiveBinding Owner_LastName}"
-                    IsEnabled="{Binding HasOwner}"
+                <ComboBox
+                    ItemsSource="{Binding Path=Domain.CurrencyKinds}"
+                    SelectedIndex="{Binding Price_KindIndex}"
                     Validation.ErrorTemplate="{StaticResource validationTemplate}"
                     />
             </StackPanel>
-        </GroupBox>
-        
-        <Label Content="Color"/>
-        <toolkit:ColorPicker
-            SelectedColor="{local:ReactiveBinding Windows_Media_Color}"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
 
-        <Label Content="Kilometers Traveled"/>
-        <toolkit:IntegerUpDown
-            Value="{
-                local:ReactiveBinding KilometersTravelled,
-                StringFormat='#'
-            }"
-            Increment="100"
-            Minimum="0"
-            Validation.ErrorTemplate="{StaticResource validationTemplate}"
-            />
-    </StackPanel>
+            <GroupBox Header="Owner">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Has Owner"/>
+                        <CheckBox
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding HasOwner}"
+                            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                            />
+                    </StackPanel>
+
+                    <Label Content="Owner First Name"/>
+                    <TextBox
+                        Text="{Binding Owner_FirstName}"
+                        IsEnabled="{Binding HasOwner}"
+                        Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                        />
+
+                    <Label Content="Owner Last Name"/>
+                    <TextBox
+                        Text="{Binding Owner_LastName}"
+                        IsEnabled="{Binding HasOwner}"
+                        Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                        />
+                </StackPanel>
+            </GroupBox>
+            
+            <Label Content="Color"/>
+            <toolkit:ColorPicker
+                SelectedColor="{Binding Windows_Media_Color}"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+
+            <Label Content="Kilometers Traveled"/>
+            <toolkit:IntegerUpDown
+                Value="{
+                    Binding KilometersTravelled,
+                    StringFormat='#'
+                }"
+                Increment="100"
+                Minimum="0"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

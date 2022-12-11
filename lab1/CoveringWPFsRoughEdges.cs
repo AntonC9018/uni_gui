@@ -107,6 +107,9 @@ public static partial class Properties
     }
 }
 
+// This one only works with the data grid control.
+// It throws an exception that binding can't be assigned to a property otherwise.
+// Just why is WPF so bad??
 [MarkupExtensionReturnType(typeof(Binding))]
 public class ReactiveBinding : MarkupExtension
 {

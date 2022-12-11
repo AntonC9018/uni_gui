@@ -196,9 +196,10 @@
                 <avalonDock:LayoutRoot>
                     <LayoutPanel Orientation="Horizontal">
                         <avalonDock:LayoutDocumentPaneGroup
-                            x:Name="PaneGroup"
                             >
-                            <avalonDock:LayoutDocumentPane>
+                            <avalonDock:LayoutDocumentPane
+                                x:Name="CarsPane"
+                                >
                                 <avalonDock:LayoutDocument
                                     Title="Document"
                                     ContentId="document"
