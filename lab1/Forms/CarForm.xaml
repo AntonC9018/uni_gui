@@ -1,0 +1,124 @@
+<UserControl
+    x:Class="CarApp.CarForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:CarApp"
+    xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+    mc:Ignorable="d">
+
+    <UserControl.DataContext>
+        <local:CarViewModel/>
+    </UserControl.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <!-- 
+            Essentially copy-paste from CarDataGrid.
+            WPF doesn't allow one to factor this out easily, especially the bindings.
+        -->
+        <Label Content="Manufactured On"/>
+        <DatePicker
+            SelectedDate="{local:ReactiveBinding ManufacturedDate}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Numberplate Text"/>
+        <TextBox
+            local:Properties.Focus="True"
+            Text="{local:ReactiveBinding NumberplateText}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Manufacturer"/>
+        <ComboBox
+            local:Properties.Focus="True"
+            ItemsSource="{Binding Path=Domain.Manufacturers}"
+            SelectedIndex="{local:ReactiveBinding ManufacturerId}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Country"/>
+        <ComboBox
+            local:Properties.Focus="True"
+            ItemsSource="{Binding Path=Domain.Countries}"
+            SelectedIndex="{local:ReactiveBinding CountryId}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Engine Kind"/>
+        <ComboBox
+            local:Properties.Focus="True"
+            ItemsSource="{Binding Path=Domain.EngineKinds}"
+            SelectedIndex="{local:ReactiveBinding EngineKindIndex}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Price"/>
+        <StackPanel Orientation="Horizontal">
+            <toolkit:DoubleUpDown
+                local:Properties.Focus="True"
+                Value="{
+                    local:ReactiveBinding Price_Value,
+                    StringFormat='#.00'
+                }"
+                Increment="10"
+                Minimum="0.01"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+            <ComboBox
+                ItemsSource="{Binding Path=Domain.CurrencyKinds}"
+                SelectedIndex="{local:ReactiveBinding Price_KindIndex}"
+                Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                />
+        </StackPanel>
+
+        <GroupBox Header="Owner">
+            <StackPanel Orientation="Vertical">
+                <Label Content="Has Owner"/>
+                <CheckBox
+                    local:Properties.Focus="True"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsChecked="{local:ReactiveBinding HasOwner}"
+                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                    />
+
+                <Label Content="Owner First Name"/>
+                <TextBox
+                    local:Properties.Focus="True"
+                    Text="{local:ReactiveBinding Owner_FirstName}"
+                    IsEnabled="{Binding HasOwner}"
+                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                    />
+
+                <Label Content="Owner Last Name"/>
+                <TextBox
+                    local:Properties.Focus="True"
+                    Text="{local:ReactiveBinding Owner_LastName}"
+                    IsEnabled="{Binding HasOwner}"
+                    Validation.ErrorTemplate="{StaticResource validationTemplate}"
+                    />
+            </StackPanel>
+        </GroupBox>
+        
+        <Label Content="Color"/>
+        <toolkit:ColorPicker
+            local:Properties.Focus="True"
+            SelectedColor="{local:ReactiveBinding Windows_Media_Color}"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+
+        <Label Content="Kilometers Traveled"/>
+        <toolkit:IntegerUpDown
+            local:Properties.Focus="True"
+            Value="{
+                local:ReactiveBinding KilometersTravelled,
+                StringFormat='#'
+            }"
+            Increment="100"
+            Minimum="0"
+            Validation.ErrorTemplate="{StaticResource validationTemplate}"
+            />
+    </StackPanel>
+</UserControl>

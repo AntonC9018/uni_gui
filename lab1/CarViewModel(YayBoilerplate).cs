@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using CarApp.Model;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace CarApp.Model;
+namespace CarApp;
 
 // Hurray, I love boilerplate so much (I don't).
 public sealed class CarViewModel : INotifyPropertyChanged, IDataErrorInfo, ICarModel
